@@ -86,6 +86,7 @@ int randomDance=0;
 int randomSteps=0;
 
 bool obstacleDetected = false;
+bool NoiseDetected = false;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -277,12 +278,19 @@ void loop() {
       //-- MODE 1 - Noise detector mode
       //---------------------------------------------------------  
       case 1:
-        //if (zowi.getNoise()>=650){ //740
-          
+        if (zowi.getNoise()>=650){ //740
+          if (NoiseDetected) {
+            NoiseDetected = false;
+          } else {
+            NoiseDetected = true;
+          }
+        }
+
+        if (NoiseDetected) {
           delay(50);  //Wait for the possible 'lag' of the button interruptions. 
                       //Sometimes, the noise sensor detect the button before the interruption takes efect 
           
-          if(!buttonPushed){
+          if(!buttonPushed) {
 
             zowi.putMouth(bigSurprise);
             zowi.sing(S_OhOoh);
@@ -308,7 +316,7 @@ void loop() {
           }
           
           if(!buttonPushed){zowi.putMouth(happyOpen);}
-        //}
+        }
         break;
         
 
