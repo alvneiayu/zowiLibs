@@ -134,7 +134,7 @@ void setup(){
 
 
   //Zowi wake up!
-  zowi.sing(S_connection);
+  //zowi.sing(S_connection);
   zowi.home();
 
 
@@ -179,7 +179,7 @@ void setup(){
   //Smile for a happy Zowi :)
   if(!buttonPushed){ 
     zowi.putMouth(smile);
-    zowi.sing(S_happy);
+    //zowi.sing(S_happy);
     delay(200);
   }
 
@@ -237,11 +237,11 @@ void loop() {
     zowi.home();
 
     delay(100); //Wait for all buttons 
-    zowi.sing(S_buttonPushed);
+    //zowi.sing(S_buttonPushed);
     delay(200); //Wait for all buttons 
 
-    if      ( buttonAPushed && !buttonBPushed){ MODE=1; zowi.sing(S_mode1);}
-    else if (!buttonAPushed && buttonBPushed) { MODE=2; zowi.sing(S_mode2);}
+    if      ( buttonAPushed && !buttonBPushed){ MODE=1; }//zowi.sing(S_mode1);}
+    else if (!buttonAPushed && buttonBPushed) { MODE=2; }//zowi.sing(S_mode2);}
 
     zowi.putMouth(MODE);
  
@@ -300,7 +300,7 @@ void loop() {
           if(!buttonPushed) {
 
             zowi.putMouth(bigSurprise);
-            zowi.sing(S_OhOoh);
+            //zowi.sing(S_OhOoh);
 
             if(buttonPushed){break;}
             zowi.putMouth(random(10,21));
