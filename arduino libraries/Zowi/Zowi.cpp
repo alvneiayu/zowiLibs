@@ -10,10 +10,10 @@
 #include "Zowi.h"
 #include <Oscillator.h>
 #include <US.h>
+#include <IR.h>
 
 
-
-void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho) {
+void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight) {
   
   servo_pins[0] = RL;
   servo_pins[1] = RR;
@@ -30,6 +30,9 @@ void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzz
   }
   
   for (int i = 0; i < 2; i++) servo_position[i] = 90;
+
+  ir_left.init(IRLeft);
+  ir_right.init(IRRight);
 
   //US sensor init with the pins:
   us.init(USTrigger, USEcho);
@@ -213,6 +216,16 @@ int Zowi::getNoise(){
     return noiseLevel;
 }
 
+//---------------------------------------------------------
+//-- Zowi getIR: return zowi's IR sensor val
+//---------------------------------------------------------
+int Zowi::getIR(int side) {
+    if (side == LEFT) {
+        return ir_left.read();
+    } else {
+        return ir_right.read();
+    }
+}
 
 //---------------------------------------------------------
 //-- Zowi getBatteryLevel: return battery voltage percent

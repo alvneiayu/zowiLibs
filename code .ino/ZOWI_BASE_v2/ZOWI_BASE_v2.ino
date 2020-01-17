@@ -286,6 +286,13 @@ void loop() {
           }
         }
 
+        Serial.print("NoiseDetected: ");
+        Serial.println(NoiseDetected);
+        Serial.print("IR right: ");
+        Serial.println(zowi.getIR(RIGHT));
+        Serial.print("IR left: ");
+        Serial.println(zowi.getIR(LEFT));
+
         if (NoiseDetected) {
           delay(50);  //Wait for the possible 'lag' of the button interruptions. 
                       //Sometimes, the noise sensor detect the button before the interruption takes efect 
@@ -299,18 +306,11 @@ void loop() {
             zowi.putMouth(random(10,21));
             randomDance=random(5,21);
             zowi.forward(3000);
-            delay(100);
+            delay(500);
             zowi.stop(300);
-            delay(100);
+            delay(500);
             zowi.back(3000);
-            delay(100);
-            zowi.stop(300);
-            delay(100);
-            zowi.left(1000);
-            delay(100);
-            zowi.stop(300);
-            delay(100);
-            zowi.right(1000);
+            delay(500);
             zowi.home();
             delay(500); //Wait for possible noise of the servos while get home
           }

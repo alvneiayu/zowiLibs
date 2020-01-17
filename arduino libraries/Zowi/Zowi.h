@@ -8,6 +8,7 @@
 #include <US.h>
 #include <LedMatrix.h>
 #include <BatReader.h>
+#include <IR.h>
 
 #include "Zowi_mouths.h"
 #include "Zowi_sounds.h"
@@ -28,13 +29,15 @@
 #define PIN_Echo    9
 #define PIN_NoiseSensor A6
 
+#define IR_LEFT_PIN           3
+#define IR_RIGHT_PIN          A3
 
 class Zowi
 {
   public:
 
     //-- Zowi initialization
-    void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo);
+    void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo, int IRLeft=IR_LEFT_PIN, int IRRight=IR_RIGHT_PIN);
 
     //-- Attach & detach functions
     void attachServos();
@@ -63,6 +66,7 @@ class Zowi
     //-- Sensors functions
     float getDistance(); //US sensor
     int getNoise();      //Noise Sensor
+    int getIR(int side);
 
     //-- Battery
     double getBatteryLevel();
@@ -88,6 +92,8 @@ class Zowi
     BatReader battery;
     Oscillator servo[4];
     US us;
+    IR ir_left;
+    IR ir_right;
 
     int servo_pins[4];
     int servo_trim[4];
