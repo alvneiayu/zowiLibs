@@ -14,7 +14,7 @@
 #include <TCS3200.h>
 
 
-void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight) {
+void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight, int LeftEncoder, int RightEncoder) {
   
   servo_pins[0] = RL;
   servo_pins[1] = RR;
@@ -38,6 +38,10 @@ void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzz
 
   // RGB Init
   rgb_detector.init();
+
+  // Encoder
+  left_encoder.init(LeftEncoder, LEFT);
+  right_encoder.init(RightEncoder, RIGHT);
 
   //US sensor init with the pins:
   us.init(USTrigger, USEcho);
@@ -243,6 +247,28 @@ int Zowi::getRGB(int *RGBValues) {
     }
 
     return false;
+}
+
+//---------------------------------------------------------
+//-- Zowi getEncLap: return zowi's Encoder Lap val
+//---------------------------------------------------------
+int Zowi::getEncLap(int side) {
+    if (side == LEFT) {
+        return left_encoder.getLap();
+    } else {
+        return right_encoder.getLap();
+    }
+}
+
+//---------------------------------------------------------
+//-- Zowi getEncRead: return zowi's Encoder val
+//---------------------------------------------------------
+int Zowi::getEncVal(int side) {
+    if (side == LEFT) {
+        return left_encoder.read();
+    } else {
+        return right_encoder.read();
+    }
 }
 
 //---------------------------------------------------------

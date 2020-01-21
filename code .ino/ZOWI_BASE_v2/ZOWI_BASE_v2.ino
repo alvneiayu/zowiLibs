@@ -288,7 +288,7 @@ void loop() {
         Serial.print("IR right: ");
         Serial.println(zowi.getIR(RIGHT));
         Serial.print("IR left: ");
-        Serial.println(zowi.getIR(LEFT));*/
+        Serial.println(zowi.getIR(LEFT));
         if (zowi.getRGB(RGBValues)) {
           Serial.print("RGB left: {");
           for (int i = 0; i < 3; i++) {
@@ -301,6 +301,15 @@ void loop() {
           }
           delay(5000);
         }
+        Serial.print("Encoder Val Left: ");
+        Serial.println(zowi.getEncVal(LEFT));
+        Serial.print("Encoder Lap Left: ");
+        Serial.println(zowi.getEncLap(LEFT));
+        Serial.print("Encoder Val Right: ");
+        Serial.println(zowi.getEncVal(RIGHT));
+        Serial.print("Encoder Lap Right: ");
+        Serial.println(zowi.getEncLap(RIGHT));*/
+        
         if(!buttonPushed){zowi.putMouth(happyOpen);}
         break;
         

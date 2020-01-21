@@ -10,6 +10,7 @@
 #include <BatReader.h>
 #include <IR.h>
 #include <TCS3200.h>
+#include <ServoEncoder.h>
 
 #include "Zowi_mouths.h"
 #include "Zowi_sounds.h"
@@ -38,12 +39,15 @@
 #define S3_PIN_RGB            A0
 #define OUT_PIN_RGB           2
 
+#define SERVO_ENC_LEFT_PIN    A4
+#define SERVO_ENC_RIGHT_PIN   A5
+
 class Zowi
 {
   public:
 
     //-- Zowi initialization
-    void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo, int IRLeft=IR_LEFT_PIN, int IRRight=IR_RIGHT_PIN);
+    void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo, int IRLeft=IR_LEFT_PIN, int IRRight=IR_RIGHT_PIN, int LeftEncoder=SERVO_ENC_LEFT_PIN, int RightEncoder=SERVO_ENC_RIGHT_PIN);
 
     //-- Attach & detach functions
     void attachServos();
@@ -74,6 +78,8 @@ class Zowi
     int getNoise();      //Noise Sensor
     int getIR(int side);
     int getRGB(int *RGBValues);
+    int getEncLap(int side);
+    int getEncVal(int side);
 
     //-- Battery
     double getBatteryLevel();
@@ -97,15 +103,17 @@ class Zowi
     
     LedMatrix ledmatrix;
     BatReader battery;
-    Oscillator servo[4];
+    Oscillator servo[2];
     US us;
     IR ir_left;
     IR ir_right;
     TCS3200 rgb_detector;
+    ServoEncoder left_encoder;
+    ServoEncoder right_encoder;
 
-    int servo_pins[4];
-    int servo_trim[4];
-    int servo_position[4];
+    int servo_pins[2];
+    int servo_trim[2];
+    int servo_position[2];
 
     int pinBuzzer;
     int pinNoiseSensor;
