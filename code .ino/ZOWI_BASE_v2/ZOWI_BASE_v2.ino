@@ -20,9 +20,6 @@
 #include <US.h>
 #include <LedMatrix.h>
 
-//-- Library to manage external interruptions
-#include <EnableInterrupt.h> 
-
 //-- Library to manage serial commands
 #include <ZowiSerialCommand.h>
 ZowiSerialCommand SCmd;  //The SerialCommand object
@@ -111,8 +108,8 @@ void setup(){
   randomSeed(analogRead(A6));
 
   //Interrumptions
-  enableInterrupt(PIN_SecondButton, secondButtonPushed, RISING);
-  enableInterrupt(PIN_ThirdButton, thirdButtonPushed, RISING);
+  attachInterrupt(PIN_SecondButton, secondButtonPushed, RISING);
+  attachInterrupt(PIN_ThirdButton, thirdButtonPushed, RISING);
 
   //Setup callbacks for SerialCommand commands 
   SCmd.addCommand("S", receiveStop);      //  sendAck & sendFinalAck
@@ -216,7 +213,7 @@ void setup(){
 //-- Principal Loop ---------------------------------------------//
 ///////////////////////////////////////////////////////////////////
 void loop() {
-
+  int RGBValues[3] = {};
 
   if (Serial.available()>0 && MODE!=2){
 
@@ -224,8 +221,8 @@ void loop() {
     zowi.putMouth(happyOpen);
 
     //Disable Pin Interruptions
-    disableInterrupt(PIN_SecondButton);
-    disableInterrupt(PIN_ThirdButton);
+    detachInterrupt(PIN_SecondButton);
+    detachInterrupt(PIN_ThirdButton);
 
     buttonPushed=false;
   }
@@ -286,37 +283,25 @@ void loop() {
           }
         }
 
-        Serial.print("NoiseDetected: ");
+        /*Serial.print("NoiseDetected: ");
         Serial.println(NoiseDetected);
         Serial.print("IR right: ");
         Serial.println(zowi.getIR(RIGHT));
         Serial.print("IR left: ");
-        Serial.println(zowi.getIR(LEFT));
-
-        if (NoiseDetected) {
-          delay(50);  //Wait for the possible 'lag' of the button interruptions. 
-                      //Sometimes, the noise sensor detect the button before the interruption takes efect 
-          
-          if(!buttonPushed) {
-
-            zowi.putMouth(bigSurprise);
-            //zowi.sing(S_OhOoh);
-
-            if(buttonPushed){break;}
-            zowi.putMouth(random(10,21));
-            randomDance=random(5,21);
-            zowi.forward(3000);
-            delay(500);
-            zowi.stop(300);
-            delay(500);
-            zowi.back(3000);
-            delay(500);
-            zowi.home();
-            delay(500); //Wait for possible noise of the servos while get home
+        Serial.println(zowi.getIR(LEFT));*/
+        if (zowi.getRGB(RGBValues)) {
+          Serial.print("RGB left: {");
+          for (int i = 0; i < 3; i++) {
+              Serial.print(RGBValues[i]);
+              if (i == 2) {
+                Serial.println("}");
+              } else {
+                Serial.print(",");
+              }
           }
-          
-          if(!buttonPushed){zowi.putMouth(happyOpen);}
+          delay(5000);
         }
+        if(!buttonPushed){zowi.putMouth(happyOpen);}
         break;
         
 

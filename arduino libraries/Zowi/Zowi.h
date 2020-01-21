@@ -9,6 +9,7 @@
 #include <LedMatrix.h>
 #include <BatReader.h>
 #include <IR.h>
+#include <TCS3200.h>
 
 #include "Zowi_mouths.h"
 #include "Zowi_sounds.h"
@@ -31,6 +32,11 @@
 
 #define IR_LEFT_PIN           3
 #define IR_RIGHT_PIN          A3
+
+#define LED_RGB               A2
+#define S2_PIN_RGB            A1
+#define S3_PIN_RGB            A0
+#define OUT_PIN_RGB           2
 
 class Zowi
 {
@@ -67,6 +73,7 @@ class Zowi
     float getDistance(); //US sensor
     int getNoise();      //Noise Sensor
     int getIR(int side);
+    int getRGB(int *RGBValues);
 
     //-- Battery
     double getBatteryLevel();
@@ -94,6 +101,7 @@ class Zowi
     US us;
     IR ir_left;
     IR ir_right;
+    TCS3200 rgb_detector;
 
     int servo_pins[4];
     int servo_trim[4];

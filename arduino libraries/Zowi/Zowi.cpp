@@ -11,6 +11,7 @@
 #include <Oscillator.h>
 #include <US.h>
 #include <IR.h>
+#include <TCS3200.h>
 
 
 void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight) {
@@ -31,8 +32,12 @@ void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzz
   
   for (int i = 0; i < 2; i++) servo_position[i] = 90;
 
+  // IR init
   ir_left.init(IRLeft);
   ir_right.init(IRRight);
+
+  // RGB Init
+  rgb_detector.init();
 
   //US sensor init with the pins:
   us.init(USTrigger, USEcho);
@@ -225,6 +230,19 @@ int Zowi::getIR(int side) {
     } else {
         return ir_right.read();
     }
+}
+
+//---------------------------------------------------------
+//-- Zowi getRGB: return zowi's RGB sensor val
+//---------------------------------------------------------
+int Zowi::getRGB(int *RGBValues) {
+    rgb_detector.attach();
+    if (rgb_detector.read(RGBValues)) {
+        rgb_detector.detach();
+        return true;
+    }
+
+    return false;
 }
 
 //---------------------------------------------------------
