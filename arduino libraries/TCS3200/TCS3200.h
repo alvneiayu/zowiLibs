@@ -1,7 +1,6 @@
 #ifndef TCS3200_h
 #define TCS3200_h
 #include "Arduino.h"
-#include "TimerOne.h"
 
 #define TCS3200_DETACHED 0
 #define TCS3200_ATTACHED 1
@@ -19,6 +18,7 @@ static int _pinS2;
 static int _pinS3;
 static int _pinOut;
 static int _pinLRGB;
+static unsigned long start;
 
 class TCS3200
 {
@@ -33,7 +33,7 @@ private:
 	static void WB(uint8_t S2, uint8_t S3);
 	static void getFreq();
 	static void count();
-	static void callback();
+	static bool callback();
 };
 
 #endif //TCS3200_h

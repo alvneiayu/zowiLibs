@@ -34,11 +34,6 @@
 #define IR_LEFT_PIN           3
 #define IR_RIGHT_PIN          A3
 
-#define LED_RGB               A2
-#define S2_PIN_RGB            A1
-#define S3_PIN_RGB            A0
-#define OUT_PIN_RGB           2
-
 #define SERVO_ENC_LEFT_PIN    A4
 #define SERVO_ENC_RIGHT_PIN   A5
 

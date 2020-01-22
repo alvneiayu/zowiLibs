@@ -95,6 +95,36 @@ int randomSteps=0;
 bool obstacleDetected = false;
 bool NoiseDetected = false;
 
+int green[3] = {140, 199, 199};
+int blue[3] = {56, 112, 112};
+int pink[3] = {255, 120, 120};
+
+int *colors[3] = {green, blue, pink};
+
+const char *returnColor(int *RGBval) {
+  bool found;
+
+  for (int i = 0; i < 3; i++) {
+    found = true;
+    for (int j = 0; j < 3; j++) {
+      if (colors[i][j] - 15 > RGBval[j] || colors[i][j] + 15 < RGBval[j]) {
+        found = false;
+        break;
+      }
+    }
+
+    if (found == true) {
+      if (i == 0)
+        return "green";
+      else if (i == 1)
+        return "blue";
+      else if (i == 2)
+        return "pink";
+    }
+  }
+
+  return "white";
+}
 
 ///////////////////////////////////////////////////////////////////
 //-- Setup ------------------------------------------------------//
@@ -224,6 +254,7 @@ void setup(){
 ///////////////////////////////////////////////////////////////////
 void loop() {
   int RGBValues[3] = {};
+  const char *col = "";
 
   if (Serial.available()>0 && MODE!=2){
 
@@ -299,40 +330,41 @@ void loop() {
           static State state = STOP;
           static int loops = 0;
 
+         if (zowi.getRGB(RGBValues)) {
+            col = returnColor(RGBValues);
+            if (col == "green") {
+              zowi.putMouth(ZowiSleeping);
+            } else if (col == "blue") {
+              zowi.putMouth(ZowiConfused);
+            } else if (col == "pink") {
+              zowi.putMouth(ZowiLove);
+            } else {
+              zowi.putMouth(sad);
+            }
+          }
+
           sensorLeft = zowi.getIR(LEFT);
           sensorRight = zowi.getIR(RIGHT);
-          Serial.print("Left :");
-          Serial.println(sensorLeft);
-          Serial.print("Right :");
-          Serial.println(sensorRight);
-          Serial.print("State :");
-          Serial.println(state);
-
           if ((sensorLeft == LOW) && (sensorRight == LOW)) {
             zowi.forward(10);
             loops = 0;
             state = MOVESTRAIGHT;
-            zowi.putMouth(happyOpen);
           } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
             zowi.left(10);
             loops = 0;
             state = MOVELEFT;
-            zowi.putMouth(happyOpen);
           } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
             zowi.right(10);
             loops = 0;
             state = MOVERIGHT;
-            zowi.putMouth(happyOpen);
           } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
             if (loops <= MAX_LOOPS) {
               if (state == MOVERIGHT) {
                 zowi.right(10);
                 loops++;
-                zowi.putMouth(happyOpen);
               } else if (state == MOVELEFT) {
                 zowi.left(10);
                 loops++;
-                zowi.putMouth(happyOpen);
               } else {
                 zowi.stop(10);
                 loops = 0;
@@ -350,36 +382,6 @@ void loop() {
           zowi.stop(10);
           zowi.putMouth(sad);
         }
-
-        /*Serial.print("Encoder Val Left: ");
-        Serial.println(zowi.getEncVal(LEFT));
-        Serial.print("Encoder Lap Left: ");
-        Serial.println(zowi.getEncLap(LEFT));
-        Serial.print("Encoder Val Right: ");
-        Serial.println(zowi.getEncVal(RIGHT));
-        Serial.print("Encoder Lap Right: ");
-        Serial.println(zowi.getEncLap(RIGHT));
-
-        if (zowi.getRGB(RGBValues)) {
-          Serial.print("RGB left: {");
-          for (int i = 0; i < 3; i++) {
-              Serial.print(RGBValues[i]);
-              if (i == 2) {
-                Serial.println("}");
-              } else {
-                Serial.print(",");
-              }
-          }
-          delay(5000);
-        }
-        Serial.print("Encoder Val Left: ");
-        Serial.println(zowi.getEncVal(LEFT));
-        Serial.print("Encoder Lap Left: ");
-        Serial.println(zowi.getEncLap(LEFT));
-        Serial.print("Encoder Val Right: ");
-        Serial.println(zowi.getEncVal(RIGHT));
-        Serial.print("Encoder Lap Right: ");
-        Serial.println(zowi.getEncLap(RIGHT));*/
         
         break;
         

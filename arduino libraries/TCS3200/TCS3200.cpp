@@ -1,15 +1,21 @@
 #include "TCS3200.h"
 
-#define DEBUG
-
 #define LED_RGB               A2
 #define S2_PIN_RGB            A1
 #define S3_PIN_RGB            A0
 #define OUT_PIN_RGB           2
 
+#define TIME_CHECK            50000
+
 //****** TCS3200 ******//
 TCS3200::TCS3200() {
   TCS3200::init();
+}
+
+bool TCS3200::callback()
+{
+    _RGBstatus = TCS3200_DETECT;
+   return true;
 }
 
 void TCS3200::init()
@@ -45,7 +51,7 @@ void TCS3200::WB(uint8_t S2, uint8_t S3)
   _g_count = 0;
   _g_flag = _g_flag + 1;
   filterColor(S2, S3);
-  Timer1.setPeriod(1000000);                  // set 1s period
+  start = millis();
 }
 
 void TCS3200::getFreq()
@@ -89,11 +95,6 @@ void TCS3200::getFreq()
   }
 }
 
-void TCS3200::callback()
-{
-    _RGBstatus = TCS3200_DETECT;
-}
-
 void TCS3200::count()
 {
   _g_count = _g_count + 1;
@@ -109,8 +110,7 @@ void TCS3200::attach()
     _g_flag = 0;
     _g_count = 0;
 
-    Timer1.initialize();          // default is 1s
-    Timer1.attachInterrupt(callback);
+    start = millis();
     attachInterrupt(digitalPinToInterrupt(OUT_PIN_RGB), count, RISING);
     _RGBstatus = TCS3200_ATTACHED;
   }
@@ -118,9 +118,6 @@ void TCS3200::attach()
 
 void TCS3200::detach()
 {
-   digitalWrite(LED_RGB, HIGH);   // Turn off the LEDs
-
-   Timer1.detachInterrupt();
    detachInterrupt(digitalPinToInterrupt(OUT_PIN_RGB));
    _g_flag = 0;
    _g_count = 0;
@@ -129,6 +126,8 @@ void TCS3200::detach()
 
 bool TCS3200::read(int *RGBValues)
 {
+  if (millis() - start > 50)
+    callback();
 
   if (_RGBstatus == TCS3200_DETECT) {
     getFreq();
