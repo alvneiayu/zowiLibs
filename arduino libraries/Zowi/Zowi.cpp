@@ -147,7 +147,7 @@ void Zowi::setRestState(bool state){
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::left(int T) {
-  int left[]={85, 85};
+  int left[]={100, 83};
   _moveServos(T, left);
 }
 
@@ -157,7 +157,7 @@ void Zowi::left(int T) {
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::right(int T) {
-  int right[]={100, 100};
+  int right[]={102, 85};
   _moveServos(T, right);
 }
 
@@ -228,7 +228,7 @@ int Zowi::getNoise(){
 //---------------------------------------------------------
 //-- Zowi getIR: return zowi's IR sensor val
 //---------------------------------------------------------
-int Zowi::getIR(int side) {
+uint8_t Zowi::getIR(int side) {
     if (side == LEFT) {
         return ir_left.read();
     } else {

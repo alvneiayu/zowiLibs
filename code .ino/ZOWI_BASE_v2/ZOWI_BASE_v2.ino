@@ -48,6 +48,7 @@ RR => |-|               |-| <= RL
 #define PIN_SecondButton 6
 #define PIN_ThirdButton 7
 
+#define MAX_LOOPS             1000
 
 ///////////////////////////////////////////////////////////////////
 //-- Global Variables -------------------------------------------//
@@ -62,6 +63,15 @@ const char name_fir='#'; //First name
 int T=1000;              //Initial duration of movement
 int moveId=0;            //Number of movement
 int moveSize=15;         //Asociated with the height of some movements
+
+typedef enum
+{
+  STOP = 0,
+  MOVESTRAIGHT,
+  MOVEBACK,
+  MOVELEFT,
+  MOVERIGHT
+} State;
 
 //---------------------------------------------------------
 //-- Zowi has 5 modes:
@@ -218,7 +228,7 @@ void loop() {
   if (Serial.available()>0 && MODE!=2){
 
     MODE=1;
-    zowi.putMouth(happyOpen);
+    //zowi.putMouth(happyOpen);
 
     //Disable Pin Interruptions
     detachInterrupt(PIN_SecondButton);
@@ -249,7 +259,7 @@ void loop() {
         delay(10);
     }
      
-    zowi.putMouth(happyOpen);
+    //zowi.putMouth(happyOpen);
 
     buttonPushed=false;
     buttonAPushed=false;
@@ -275,20 +285,81 @@ void loop() {
       //-- MODE 1 - Noise detector mode
       //---------------------------------------------------------  
       case 1:
-        if (zowi.getNoise()>=650){ //740
-          if (NoiseDetected) {
+        /*if (zowi.getNoise()>=650){ //740
+          if (NoiseDetected) {*/
             NoiseDetected = false;
-          } else {
+          /*} else {
             NoiseDetected = true;
           }
+        }*/
+
+        if (NoiseDetected == false) {
+          static uint8_t sensorLeft = 0;
+          static uint8_t sensorRight = 0;
+          static State state = STOP;
+          static int loops = 0;
+
+          sensorLeft = zowi.getIR(LEFT);
+          sensorRight = zowi.getIR(RIGHT);
+          Serial.print("Left :");
+          Serial.println(sensorLeft);
+          Serial.print("Right :");
+          Serial.println(sensorRight);
+          Serial.print("State :");
+          Serial.println(state);
+
+          if ((sensorLeft == LOW) && (sensorRight == LOW)) {
+            zowi.forward(10);
+            loops = 0;
+            state = MOVESTRAIGHT;
+            zowi.putMouth(happyOpen);
+          } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
+            zowi.left(10);
+            loops = 0;
+            state = MOVELEFT;
+            zowi.putMouth(happyOpen);
+          } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
+            zowi.right(10);
+            loops = 0;
+            state = MOVERIGHT;
+            zowi.putMouth(happyOpen);
+          } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
+            if (loops <= MAX_LOOPS) {
+              if (state == MOVERIGHT) {
+                zowi.right(10);
+                loops++;
+                zowi.putMouth(happyOpen);
+              } else if (state == MOVELEFT) {
+                zowi.left(10);
+                loops++;
+                zowi.putMouth(happyOpen);
+              } else {
+                zowi.stop(10);
+                loops = 0;
+                state = STOP;
+                zowi.putMouth(sad);
+              }
+            } else {
+              zowi.stop(10);
+              loops = 0;
+              state = STOP;
+              zowi.putMouth(sad);
+            }
+          }
+        } else {
+          zowi.stop(10);
+          zowi.putMouth(sad);
         }
 
-        /*Serial.print("NoiseDetected: ");
-        Serial.println(NoiseDetected);
-        Serial.print("IR right: ");
-        Serial.println(zowi.getIR(RIGHT));
-        Serial.print("IR left: ");
-        Serial.println(zowi.getIR(LEFT));
+        /*Serial.print("Encoder Val Left: ");
+        Serial.println(zowi.getEncVal(LEFT));
+        Serial.print("Encoder Lap Left: ");
+        Serial.println(zowi.getEncLap(LEFT));
+        Serial.print("Encoder Val Right: ");
+        Serial.println(zowi.getEncVal(RIGHT));
+        Serial.print("Encoder Lap Right: ");
+        Serial.println(zowi.getEncLap(RIGHT));
+
         if (zowi.getRGB(RGBValues)) {
           Serial.print("RGB left: {");
           for (int i = 0; i < 3; i++) {
@@ -310,7 +381,6 @@ void loop() {
         Serial.print("Encoder Lap Right: ");
         Serial.println(zowi.getEncLap(RIGHT));*/
         
-        if(!buttonPushed){zowi.putMouth(happyOpen);}
         break;
         
 

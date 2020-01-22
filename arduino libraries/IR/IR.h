@@ -8,7 +8,7 @@ public:
 	IR();
 	void init(int pinTrigger);
 	IR(int pinTrigger);
-	float read();
+	uint8_t read();
 
 private:
 	int _pinTrigger;

@@ -76,7 +76,7 @@ class Zowi
     //-- Sensors functions
     float getDistance(); //US sensor
     int getNoise();      //Noise Sensor
-    int getIR(int side);
+    uint8_t getIR(int side);
     int getRGB(int *RGBValues);
     int getEncLap(int side);
     int getEncVal(int side);

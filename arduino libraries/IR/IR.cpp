@@ -14,6 +14,7 @@ void IR::init(int pinTrigger)
   pinMode( _pinTrigger , INPUT);
 }
 
-float IR::read(){
-  return digitalRead(_pinTrigger);;
+uint8_t IR::read(){
+  return digitalRead(_pinTrigger);
+
 }
