@@ -95,16 +95,39 @@ int randomSteps=0;
 bool obstacleDetected = false;
 bool NoiseDetected = false;
 
-int green[3] = {140, 199, 199};
+int green[3] = {153, 217, 218};
 int blue[3] = {56, 112, 112};
 int pink[3] = {255, 120, 120};
+int black[3] = {15, 15, 15};
 
-int *colors[3] = {green, blue, pink};
+#define NUMBER_OF_COLORS 4
 
-const char *returnColor(int *RGBval) {
+int *colors[NUMBER_OF_COLORS] = {green, blue, pink, black};
+
+typedef enum
+{
+  GREEN = 0,
+  PINK = 1,
+  BLUE = 2,
+  WHITE = 3,
+  BLACK = 4
+} Color;
+
+int color_index = 0;
+int color_orders[15] = {};
+bool valid_color = false;
+
+int forward[2] = { PINK, MOVESTRAIGHT };
+int left[2] = { GREEN, MOVELEFT };
+int right[2] = { BLUE, MOVERIGHT };
+
+#define NUMBER_OF_ORDERS 3
+int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right};
+
+int returnColor(int *RGBval) {
   bool found;
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < NUMBER_OF_COLORS; i++) {
     found = true;
     for (int j = 0; j < 3; j++) {
       if (colors[i][j] - 15 > RGBval[j] || colors[i][j] + 15 < RGBval[j]) {
@@ -115,15 +138,43 @@ const char *returnColor(int *RGBval) {
 
     if (found == true) {
       if (i == 0)
-        return "green";
+        return GREEN;
       else if (i == 1)
-        return "blue";
+        return BLUE;
       else if (i == 2)
-        return "pink";
+        return PINK;
+      else if (i == 3)
+        return BLACK;
     }
   }
 
-  return "white";
+  return WHITE;
+}
+
+int executeOrder(int order) {
+  bool found;
+
+  for (int i = 0; i < NUMBER_OF_ORDERS; i++) {
+    if (orders_color[i][0] != order)
+      continue;
+
+    switch (orders_color[i][1]) {
+    case MOVESTRAIGHT:
+      //zowi.forward_order(50);
+      Serial.println("MOVESTRAIGHT");
+      break;
+    case MOVELEFT:
+      //zowi.left_order(50);
+      Serial.println("MOVELEFT");
+      break;
+    case MOVERIGHT:
+      //zowi.left_order(50);
+      Serial.println("MOVERIGHT");
+      break;
+    default:
+      break;
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -254,7 +305,7 @@ void setup(){
 ///////////////////////////////////////////////////////////////////
 void loop() {
   int RGBValues[3] = {};
-  const char *col = "";
+  int col;
 
   if (Serial.available()>0 && MODE!=2){
 
@@ -330,54 +381,64 @@ void loop() {
           static State state = STOP;
           static int loops = 0;
 
-         if (zowi.getRGB(RGBValues)) {
-            col = returnColor(RGBValues);
-            if (col == "green") {
-              zowi.putMouth(ZowiSleeping);
-            } else if (col == "blue") {
-              zowi.putMouth(ZowiConfused);
-            } else if (col == "pink") {
-              zowi.putMouth(ZowiLove);
-            } else {
-              zowi.putMouth(sad);
-            }
-          }
+         if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
+           for (int i = 0; i < color_index; i++)
+              executeOrder(color_orders[i]);
 
-          sensorLeft = zowi.getIR(LEFT);
-          sensorRight = zowi.getIR(RIGHT);
-          if ((sensorLeft == LOW) && (sensorRight == LOW)) {
-            zowi.forward(10);
-            loops = 0;
-            state = MOVESTRAIGHT;
-          } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
-            zowi.left(10);
-            loops = 0;
-            state = MOVELEFT;
-          } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
-            zowi.right(10);
-            loops = 0;
-            state = MOVERIGHT;
-          } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
-            if (loops <= MAX_LOOPS) {
-              if (state == MOVERIGHT) {
-                zowi.right(10);
-                loops++;
-              } else if (state == MOVELEFT) {
-                zowi.left(10);
-                loops++;
-              } else {
-                zowi.stop(10);
-                loops = 0;
-                state = STOP;
-                zowi.putMouth(sad);
-              }
-            } else {
-              zowi.stop(10);
-              loops = 0;
-              state = STOP;
-              zowi.putMouth(sad);
-            }
-          }
+           color_index = 0;
+           memset(color_orders, 0, sizeof(color_orders));
+         } else {
+           if (zowi.getRGB(RGBValues)) {
+             col = returnColor(RGBValues);
+             if (col >= 0) {
+               if (col == WHITE) {
+                 valid_color = false;
+               }
+
+               if (valid_color == false && col != WHITE) {
+                 valid_color = true;
+                 color_orders[color_index] = col;
+                 color_index = color_index + 1;
+               }
+             }
+           }
+
+           sensorLeft = zowi.getIR(LEFT);
+           sensorRight = zowi.getIR(RIGHT);
+           if ((sensorLeft == LOW) && (sensorRight == LOW)) {
+             zowi.forward(10);
+             loops = 0;
+             state = MOVESTRAIGHT;
+           } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
+             zowi.left(10);
+             loops = 0;
+             state = MOVELEFT;
+           } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
+             zowi.right(10);
+             loops = 0;
+             state = MOVERIGHT;
+           } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
+             if (loops <= MAX_LOOPS) {
+               if (state == MOVERIGHT) {
+                 zowi.right(10);
+                 loops++;
+               } else if (state == MOVELEFT) {
+                 zowi.left(10);
+                 loops++;
+               } else {
+                 zowi.stop(10);
+                 loops = 0;
+                 state = STOP;
+                 zowi.putMouth(sad);
+               }
+             } else {
+               zowi.stop(10);
+               loops = 0;
+               state = STOP;
+               zowi.putMouth(sad);
+             }
+           }
+         }
         } else {
           zowi.stop(10);
           zowi.putMouth(sad);
