@@ -81,7 +81,7 @@ typedef enum
 //--    * MODE = 3: Noise detector mode   
 //--    * MODE = 4: ZowiPAD or any Teleoperation mode (listening SerialPort). 
 //---------------------------------------------------------
-volatile int MODE=1; //State of zowi in the principal state machine. 
+volatile int MODE=2; //State of zowi in the principal state machine. 
 
 volatile bool buttonPushed=false;  //Variable to remember when a button has been pushed
 volatile bool buttonAPushed=false; //Variable to remember when A button has been pushed
@@ -99,10 +99,11 @@ int green[3] = {153, 217, 218};
 int blue[3] = {56, 112, 112};
 int pink[3] = {255, 120, 120};
 int black[3] = {15, 15, 15};
+int black_2[3] = {30, 30, 30};
 
-#define NUMBER_OF_COLORS 4
+#define NUMBER_OF_COLORS 5
 
-int *colors[NUMBER_OF_COLORS] = {green, blue, pink, black};
+int *colors[NUMBER_OF_COLORS] = {green, blue, pink, black, black_2};
 
 typedef enum
 {
@@ -144,7 +145,7 @@ int returnColor(int *RGBval) {
         return BLUE;
       else if (i == 2)
         return PINK;
-      else if (i == 3)
+      else if (i == 3 || i == 4)
         return BLACK;
     }
   }
@@ -310,7 +311,7 @@ void loop() {
   int RGBValues[3] = {};
   int col;
 
-  if (Serial.available()>0 && MODE!=2){
+  if (Serial.available()>0 && MODE!=3){
 
     MODE=1;
     //zowi.putMouth(happyOpen);
@@ -451,10 +452,21 @@ void loop() {
 
         break;
         
+      case 2: //Calibration RGB
+        char buf[200];
+        
+        if (zowi.getRGB(RGBValues)) {
+          col = returnColor(RGBValues);
+          for (int i = 0; i < 3; i++) {
+            sprintf(buf, "RGB[%d] = %d", i, RGBValues[i]);
+            Serial.println(buf);
+          }
+        }
+      break;
 
       //-- MODE 2 - ZowiPAD or any Teleoperation mode (listening SerialPort) 
       //---------------------------------------------------------
-      case 2:
+      case 3:
 
         SCmd.readSerial();
         
