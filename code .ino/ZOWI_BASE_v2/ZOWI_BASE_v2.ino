@@ -95,17 +95,6 @@ int randomSteps=0;
 bool obstacleDetected = false;
 bool NoiseDetected = false;
 
-int green[3] = {73, 95, 94};
-int blue[3] = {78, 112, 110};
-int red[3] = {173, 73, 73};
-int black[3] = {15, 15, 15};
-int black_2[3] = {43, 34, 35};
-int yellow[3] = {237, 180, 177};
-
-#define NUMBER_OF_COLORS 6
-
-int *colors[NUMBER_OF_COLORS] = {green, blue, red, black, black_2, yellow};
-
 typedef enum
 {
   GREEN = 0,
@@ -115,6 +104,17 @@ typedef enum
   BLACK,
   YELLOW,
 } Color;
+
+int green[4] = {GREEN, 73, 95, 94};
+int blue[4] = {BLUE, 78, 112, 110};
+int red[4] = {RED, 173, 73, 73};
+int black[4] = {BLACK, 15, 15, 15};
+int black_2[4] = {BLACK, 43, 34, 35};
+int yellow[4] = {YELLOW, 237, 180, 177};
+
+#define NUMBER_OF_COLORS 6
+
+int *colors[NUMBER_OF_COLORS] = {green, blue, red, black, black_2, yellow};
 
 int color_index = 0;
 int color_orders[15] = {};
@@ -134,25 +134,15 @@ int returnColor(int *RGBval) {
 
   for (int i = 0; i < NUMBER_OF_COLORS; i++) {
     found = true;
-    for (int j = 0; j < 3; j++) {
-      if (colors[i][j] - 15 > RGBval[j] || colors[i][j] + 15 < RGBval[j]) {
+    for (int j = 1; j < 4; j++) {
+      if (colors[i][j] - 15 > RGBval[j - 1] || colors[i][j] + 15 < RGBval[j - 1]) {
         found = false;
         break;
       }
     }
 
-    if (found == true) {
-      if (i == 0)
-        return GREEN;
-      else if (i == 1)
-        return BLUE;
-      else if (i == 2)
-        return RED;
-      else if (i == 3 || i == 4)
-        return BLACK;
-      else if (i == 5)
-        return YELLOW;
-    }
+    if (found == true)
+      return colors[i][0];
   }
 
   return WHITE;
