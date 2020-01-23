@@ -94,6 +94,8 @@ int randomSteps=0;
 
 bool obstacleDetected = false;
 bool NoiseDetected = false;
+bool OrderClap = false;
+bool programRunning = false;
 
 typedef enum
 {
@@ -368,14 +370,18 @@ void loop() {
       //-- MODE 1 - Noise detector mode
       //---------------------------------------------------------  
       case 1:
-        if (zowi.getNoise()>=650){ //740
-          if (millis() - clap_time > 1000) {
-            if (NoiseDetected) {
-              NoiseDetected = false;
-            } else {
-              NoiseDetected = true;
+        Serial.println(programRunning);
+        if (programRunning == false) {
+          if (zowi.getNoise()>=650){ //740
+            Serial.println("entramos");
+            if (millis() - clap_time > 1000) {
+              if (NoiseDetected) {
+                NoiseDetected = false;
+              } else {
+                NoiseDetected = true;
+              }
+              clap_time = millis();
             }
-            clap_time = millis();
           }
         }
 
@@ -386,7 +392,16 @@ void loop() {
           static int loops = 0;
 
          if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-           zowi.forward(3000);
+
+           if (OrderClap == false) {
+             zowi.forward(3000);
+             OrderClap = true;
+             NoiseDetected = false;
+             programRunning = false;
+             return;
+           }
+
+           programRunning = true;
 
            for (int i = 0; i < color_index; i++) {
               executeOrder(color_orders[i]);
@@ -395,7 +410,10 @@ void loop() {
            color_index = 0;
            memset(color_orders, 0, sizeof(color_orders));
            NoiseDetected = false;
+           OrderClap = false;
+           programRunning = false;
          } else {
+           programRunning = true;
            if (zowi.getRGB(RGBValues)) {
              col = returnColor(RGBValues);
              if (col >= 0) {
