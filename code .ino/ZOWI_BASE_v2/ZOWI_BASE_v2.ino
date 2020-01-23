@@ -126,6 +126,8 @@ int right[2] = { BLUE, MOVERIGHT };
 int stop[2] = { BLACK, STOP };
 int back[2] = { YELLOW, MOVEBACK };
 
+unsigned long clap_time = -1;
+
 #define NUMBER_OF_ORDERS 5
 int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, back, stop};
 
@@ -366,15 +368,18 @@ void loop() {
       //-- MODE 1 - Noise detector mode
       //---------------------------------------------------------  
       case 1:
-        /*if (zowi.getNoise()>=650){ //740
-          if (NoiseDetected) {*/
-            NoiseDetected = false;
-          /*} else {
-            NoiseDetected = true;
+        if (zowi.getNoise()>=650){ //740
+          if (millis() - clap_time > 1000) {
+            if (NoiseDetected) {
+              NoiseDetected = false;
+            } else {
+              NoiseDetected = true;
+            }
+            clap_time = millis();
           }
-        }*/
+        }
 
-        if (NoiseDetected == false) {
+        if (NoiseDetected == true) {
           static uint8_t sensorLeft = 0;
           static uint8_t sensorRight = 0;
           static State state = STOP;
@@ -389,6 +394,7 @@ void loop() {
 
            color_index = 0;
            memset(color_orders, 0, sizeof(color_orders));
+           NoiseDetected = false;
          } else {
            if (zowi.getRGB(RGBValues)) {
              col = returnColor(RGBValues);
