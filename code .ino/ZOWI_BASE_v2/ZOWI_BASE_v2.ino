@@ -120,9 +120,10 @@ bool valid_color = false;
 int forward[2] = { PINK, MOVESTRAIGHT };
 int left[2] = { GREEN, MOVELEFT };
 int right[2] = { BLUE, MOVERIGHT };
+int stop[2] = { BLACK, STOP };
 
-#define NUMBER_OF_ORDERS 3
-int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right};
+#define NUMBER_OF_ORDERS 4
+int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, stop};
 
 int returnColor(int *RGBval) {
   bool found;
@@ -160,16 +161,20 @@ int executeOrder(int order) {
 
     switch (orders_color[i][1]) {
     case MOVESTRAIGHT:
-      //zowi.forward_order(50);
-      Serial.println("MOVESTRAIGHT");
+      zowi.forward(2500);
       break;
     case MOVELEFT:
-      //zowi.left_order(50);
-      Serial.println("MOVELEFT");
+      zowi.left_order(1010);
       break;
     case MOVERIGHT:
-      //zowi.left_order(50);
-      Serial.println("MOVERIGHT");
+      zowi.right_order(850);
+      break;
+    case STOP:
+      zowi.stop(100);
+      break;
+    case MOVEBACK:
+      zowi.back(2500);
+      zowi.stop(100);
       break;
     default:
       break;
@@ -298,8 +303,6 @@ void setup(){
 
 }
 
-
-
 ///////////////////////////////////////////////////////////////////
 //-- Principal Loop ---------------------------------------------//
 ///////////////////////////////////////////////////////////////////
@@ -382,8 +385,10 @@ void loop() {
           static int loops = 0;
 
          if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-           for (int i = 0; i < color_index; i++)
+           for (int i = 0; i < color_index; i++) {
+              Serial.println(color_orders[i]);
               executeOrder(color_orders[i]);
+           }
 
            color_index = 0;
            memset(color_orders, 0, sizeof(color_orders));
@@ -443,7 +448,7 @@ void loop() {
           zowi.stop(10);
           zowi.putMouth(sad);
         }
-        
+
         break;
         
 

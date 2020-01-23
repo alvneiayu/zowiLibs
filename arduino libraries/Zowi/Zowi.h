@@ -68,6 +68,9 @@ class Zowi
     void forward(int T = 1000);
     void stop(int T = 1000);
 
+    void left_order(int T = 1000);
+    void right_order(int T = 1000);
+
     //-- Sensors functions
     float getDistance(); //US sensor
     int getNoise();      //Noise Sensor

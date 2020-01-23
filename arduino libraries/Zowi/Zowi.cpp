@@ -94,18 +94,17 @@ void Zowi::_moveServos(int time, int  servo_target[]) {
         setRestState(false);
   }
 
-  if(time>10){
-    for (int i = 0; i < 2; i++) increment[i] = ((servo_target[i]) - servo_position[i]) / (time / 10.0);
+  if(time > 10) {
+    final_time = millis() + time;
+    for (int i = 0; i < 2; i++)
+      servo[i].SetPosition(servo_target[i]);
+    
     final_time =  millis() + time;
-
-    for (int iteration = 1; millis() < final_time; iteration++) {
-      partial_time = millis() + 10;
-      for (int i = 0; i < 2; i++) servo[i].SetPosition(servo_position[i] + (iteration * increment[i]));
-      while (millis() < partial_time); //pause
-    }
-  }
-  else{
-    for (int i = 0; i < 2; i++) servo[i].SetPosition(servo_target[i]);
+    while (millis() <= final_time)
+      continue;
+  } else {
+    for (int i = 0; i < 2; i++)
+      servo[i].SetPosition(servo_target[i]);
   }
   for (int i = 0; i < 2; i++) servo_position[i] = servo_target[i];
 }
@@ -177,7 +176,7 @@ void Zowi::forward(int T) {
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::back(int T) {
-  int back[]={85, 100};
+  int back[]={83, 100};
   _moveServos(T, back);
 }
 
@@ -189,6 +188,26 @@ void Zowi::back(int T) {
 void Zowi::stop(int T) {
   int stop[]={90, 90};
   _moveServos(T, stop);
+}
+
+//---------------------------------------------------------
+//-- Zowi movement: left_order
+//--  Parameters:
+//--    T: Period
+//---------------------------------------------------------
+void Zowi::left_order(int T) {
+  int left_order[]={85, 85};
+  _moveServos(T, left_order);
+}
+
+//---------------------------------------------------------
+//-- Zowi movement: right_order
+//--  Parameters:
+//--    T: Period
+//---------------------------------------------------------
+void Zowi::right_order(int T) {
+  int right_order[]={100, 100};
+  _moveServos(T, right_order);
 }
 
 ///////////////////////////////////////////////////////////////////
