@@ -381,6 +381,8 @@ void loop() {
           static int loops = 0;
 
          if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
+           zowi.forward(3000);
+
            for (int i = 0; i < color_index; i++) {
               executeOrder(color_orders[i]);
            }
