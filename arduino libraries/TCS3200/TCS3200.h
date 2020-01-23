@@ -10,10 +10,9 @@
 
 static int _g_count;
 static int _g_flag;
-static float _scaleFactor[3];
+static float _scaleFactor[3] = {-1, -1, -1};
 static int _freqValues[3];
 static int _RGBstatus;
-static int _calibration;
 static int _pinS2;
 static int _pinS3;
 static int _pinOut;

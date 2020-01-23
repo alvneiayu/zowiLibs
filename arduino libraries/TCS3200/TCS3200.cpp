@@ -5,7 +5,7 @@
 #define S3_PIN_RGB            A0
 #define OUT_PIN_RGB           2
 
-#define TIME_CHECK            50000
+#define TIME_CHECK            50
 
 //****** TCS3200 ******//
 TCS3200::TCS3200() {
@@ -27,7 +27,6 @@ void TCS3200::init()
   pinMode(S2_PIN_RGB, OUTPUT);
   pinMode(S3_PIN_RGB, OUTPUT);
   pinMode(OUT_PIN_RGB, INPUT);
-  _calibration = 0;
 
   digitalWrite(LED_RGB, HIGH);   // Turn off LEDs
 }
@@ -126,13 +125,13 @@ void TCS3200::detach()
 
 bool TCS3200::read(int *RGBValues)
 {
-  if (millis() - start > 50)
+  if (millis() - start > TIME_CHECK)
     callback();
 
   if (_RGBstatus == TCS3200_DETECT) {
     getFreq();
     if (_g_flag > 3) {
-      if (_calibration == 0) {
+      if (_scaleFactor[0] == -1 || _scaleFactor[1] == -1 || _scaleFactor[2] == -1) {
         for(int i = 0; i < 3; i++) {
           _scaleFactor[i] = 255.0 / _freqValues[i];
 #ifdef DEBUG
@@ -147,7 +146,6 @@ bool TCS3200::read(int *RGBValues)
   }
 
   if (_RGBstatus == TCS3200_READY) {
-    _calibration = 1;
     for(int j = 0; j < 3; j++) {
       RGBValues[j] = _freqValues[j] * _scaleFactor[j];
       if (RGBValues[j] > 255)
