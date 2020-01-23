@@ -81,7 +81,7 @@ typedef enum
 //--    * MODE = 3: Noise detector mode   
 //--    * MODE = 4: ZowiPAD or any Teleoperation mode (listening SerialPort). 
 //---------------------------------------------------------
-volatile int MODE=2; //State of zowi in the principal state machine. 
+volatile int MODE=1; //State of zowi in the principal state machine. 
 
 volatile bool buttonPushed=false;  //Variable to remember when a button has been pushed
 volatile bool buttonAPushed=false; //Variable to remember when A button has been pushed
@@ -95,36 +95,39 @@ int randomSteps=0;
 bool obstacleDetected = false;
 bool NoiseDetected = false;
 
-int green[3] = {153, 217, 218};
-int blue[3] = {56, 112, 112};
-int pink[3] = {255, 120, 120};
+int green[3] = {73, 95, 94};
+int blue[3] = {78, 112, 110};
+int red[3] = {173, 73, 73};
 int black[3] = {15, 15, 15};
-int black_2[3] = {30, 30, 30};
+int black_2[3] = {43, 34, 35};
+int yellow[3] = {237, 180, 177};
 
-#define NUMBER_OF_COLORS 5
+#define NUMBER_OF_COLORS 6
 
-int *colors[NUMBER_OF_COLORS] = {green, blue, pink, black, black_2};
+int *colors[NUMBER_OF_COLORS] = {green, blue, red, black, black_2, yellow};
 
 typedef enum
 {
   GREEN = 0,
-  PINK = 1,
-  BLUE = 2,
-  WHITE = 3,
-  BLACK = 4
+  RED,
+  BLUE,
+  WHITE,
+  BLACK,
+  YELLOW,
 } Color;
 
 int color_index = 0;
 int color_orders[15] = {};
 bool valid_color = false;
 
-int forward[2] = { PINK, MOVESTRAIGHT };
+int forward[2] = { RED, MOVESTRAIGHT };
 int left[2] = { GREEN, MOVELEFT };
 int right[2] = { BLUE, MOVERIGHT };
 int stop[2] = { BLACK, STOP };
+int back[2] = { YELLOW, MOVEBACK };
 
-#define NUMBER_OF_ORDERS 4
-int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, stop};
+#define NUMBER_OF_ORDERS 5
+int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, back, stop};
 
 int returnColor(int *RGBval) {
   bool found;
@@ -144,9 +147,11 @@ int returnColor(int *RGBval) {
       else if (i == 1)
         return BLUE;
       else if (i == 2)
-        return PINK;
+        return RED;
       else if (i == 3 || i == 4)
         return BLACK;
+      else if (i == 5)
+        return YELLOW;
     }
   }
 
@@ -387,7 +392,6 @@ void loop() {
 
          if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
            for (int i = 0; i < color_index; i++) {
-              Serial.println(color_orders[i]);
               executeOrder(color_orders[i]);
            }
 
