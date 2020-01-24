@@ -442,8 +442,13 @@ void loop() {
              buttonAPushed = false;
            }
          } else {
-           zowi.stop(10);
-           zowi.putMouth(sad);         
+           if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
+             zowi.stop(10);
+             zowi.putMouth(smile);
+           } else {
+             zowi.stop(10);
+             zowi.putMouth(sad);
+           }
          }
 
         break;
