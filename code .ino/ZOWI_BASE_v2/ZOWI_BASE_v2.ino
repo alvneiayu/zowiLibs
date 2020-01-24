@@ -373,8 +373,6 @@ void loop() {
                executeOrder(color_orders[i]);
              }
 
-             color_index = 0;
-             memset(color_orders, 0, sizeof(color_orders));
              buttonBPushed=false;
            } else {
              zowi.putMouth(interrogation);
