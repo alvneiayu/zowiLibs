@@ -153,7 +153,7 @@ int executeOrder(int order) {
 
     switch (orders_color[i][1]) {
     case MOVESTRAIGHT:
-      zowi.forward(2500);
+      zowi.forward(2000);
       break;
     case MOVELEFT:
       zowi.left_order(1010);

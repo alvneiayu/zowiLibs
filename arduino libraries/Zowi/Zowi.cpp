@@ -166,7 +166,7 @@ void Zowi::right(int T) {
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::forward(int T) {
-  int forward[]={100, 85};
+  int forward[]={102, 83};
   _moveServos(T, forward);
 }
 
