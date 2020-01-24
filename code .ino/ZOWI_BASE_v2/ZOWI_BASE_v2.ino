@@ -89,13 +89,7 @@ volatile bool buttonBPushed=false; //Variable to remember when B button has been
 
 unsigned long previousMillis=0;
 
-int randomDance=0;
-int randomSteps=0;
-
 bool obstacleDetected = false;
-bool NoiseDetected = false;
-bool OrderClap = false;
-bool programRunning = false;
 
 typedef enum
 {
@@ -127,8 +121,6 @@ int left[2] = { GREEN, MOVELEFT };
 int right[2] = { BLUE, MOVERIGHT };
 int stop[2] = { BLACK, STOP };
 int back[2] = { YELLOW, MOVEBACK };
-
-unsigned long clap_time = -1;
 
 #define NUMBER_OF_ORDERS 5
 int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, back, stop};
@@ -202,10 +194,6 @@ void setup(){
 
   //Set a random seed
   randomSeed(analogRead(A6));
-
-  //Interrumptions
-  attachInterrupt(PIN_SecondButton, secondButtonPushed, RISING);
-  attachInterrupt(PIN_ThirdButton, thirdButtonPushed, RISING);
 
   //Setup callbacks for SerialCommand commands 
   SCmd.addCommand("S", receiveStop);      //  sendAck & sendFinalAck
@@ -315,13 +303,8 @@ void loop() {
     MODE=1;
     //zowi.putMouth(happyOpen);
 
-    //Disable Pin Interruptions
-    detachInterrupt(PIN_SecondButton);
-    detachInterrupt(PIN_ThirdButton);
-
     buttonPushed=false;
   }
-
 
   //First attemp to initial software
   if (buttonPushed){  
@@ -331,9 +314,6 @@ void loop() {
     delay(100); //Wait for all buttons 
     //zowi.sing(S_buttonPushed);
     delay(200); //Wait for all buttons 
-
-    if      ( buttonAPushed && !buttonBPushed){ MODE=1; }//zowi.sing(S_mode1);}
-    else if (!buttonAPushed && buttonBPushed) { MODE=2; }//zowi.sing(S_mode2);}
 
     zowi.putMouth(MODE);
  
@@ -347,8 +327,6 @@ void loop() {
     //zowi.putMouth(happyOpen);
 
     buttonPushed=false;
-    buttonAPushed=false;
-    buttonBPushed=false;
 
   }else{
 
@@ -370,50 +348,40 @@ void loop() {
       //-- MODE 1 - Noise detector mode
       //---------------------------------------------------------  
       case 1:
-        Serial.println(programRunning);
-        if (programRunning == false) {
-          if (zowi.getNoise()>=650){ //740
-            Serial.println("entramos");
-            if (millis() - clap_time > 1000) {
-              if (NoiseDetected) {
-                NoiseDetected = false;
-              } else {
-                NoiseDetected = true;
-              }
-              clap_time = millis();
-            }
-          }
-        }
-
-        if (NoiseDetected == true) {
+      
           static uint8_t sensorLeft = 0;
           static uint8_t sensorRight = 0;
           static State state = STOP;
           static int loops = 0;
 
-         if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
+         if (buttonBPushed == false)
+           buttonBPushed = digitalRead(PIN_ThirdButton);
 
-           if (OrderClap == false) {
-             zowi.forward(3000);
-             OrderClap = true;
-             NoiseDetected = false;
-             programRunning = false;
+         if (buttonAPushed == false) {
+           buttonAPushed = digitalRead(PIN_SecondButton);
+           if (buttonAPushed == true && color_index != 0) {
+             color_index = 0;
+             memset(color_orders, 0, sizeof(color_orders));            
+           }
+         }
+
+         if (buttonBPushed == true) {
+           if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
+             zowi.putMouth(smile);
+
+             for (int i = 0; i < color_index; i++) {
+               executeOrder(color_orders[i]);
+             }
+
+             color_index = 0;
+             memset(color_orders, 0, sizeof(color_orders));
+             buttonBPushed=false;
+           } else {
+             zowi.putMouth(interrogation);
+             buttonBPushed=false;
              return;
            }
-
-           programRunning = true;
-
-           for (int i = 0; i < color_index; i++) {
-              executeOrder(color_orders[i]);
-           }
-
-           color_index = 0;
-           memset(color_orders, 0, sizeof(color_orders));
-           NoiseDetected = false;
-           OrderClap = false;
-           programRunning = false;
-         } else {
-           programRunning = true;
+         } else if (buttonAPushed == true) {
            if (zowi.getRGB(RGBValues)) {
              col = returnColor(RGBValues);
              if (col >= 0) {
@@ -469,11 +437,14 @@ void loop() {
                zowi.putMouth(sad);
              }
            }
+           if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
+             zowi.forward(3000);
+             buttonAPushed = false;
+           }
+         } else {
+           zowi.stop(10);
+           zowi.putMouth(sad);         
          }
-        } else {
-          zowi.stop(10);
-          zowi.putMouth(sad);
-        }
 
         break;
         
@@ -516,30 +487,7 @@ void loop() {
 
 ///////////////////////////////////////////////////////////////////
 //-- Functions --------------------------------------------------//
-///////////////////////////////////////////////////////////////////
-
-//-- Function executed when second button is pushed
-void secondButtonPushed(){ 
-
-    buttonAPushed=true;
-
-    if(!buttonPushed){
-        buttonPushed=true;
-        zowi.putMouth(smallSurprise);
-    }    
-}
-
-//-- Function executed when third button is pushed
-void thirdButtonPushed(){ 
-
-    buttonBPushed=true;
-
-    if(!buttonPushed){
-        buttonPushed=true;
-        zowi.putMouth(smallSurprise);
-    }
-}
-
+//////////////////////////////////////////////////////////////////        /
 
 //-- Function to read distance sensor & to actualize obstacleDetected variable
 void obstacleDetector(){
