@@ -438,7 +438,7 @@ void loop() {
              }
            }
            if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-             zowi.forward(3000);
+             //zowi.forward(3000);
              buttonAPushed = false;
            }
          } else {
