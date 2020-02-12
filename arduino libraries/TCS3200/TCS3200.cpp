@@ -38,7 +38,7 @@ void TCS3200::filterColor(uint8_t S2, uint8_t S3)
   }
 
   if(S3 != 0) {
-    S2 = HIGH;
+    S3 = HIGH;
   }
 
   digitalWrite(S2_PIN_RGB, S2);
