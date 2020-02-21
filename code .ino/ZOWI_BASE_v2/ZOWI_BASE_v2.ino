@@ -128,6 +128,8 @@ int back[2] = { YELLOW, MOVEBACK };
 #define THRESHOLD 30
 int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, back, stop};
 
+int test_sequence[9] = {YELLOW, RED, GREEN, BLUE, RED, GREEN, YELLOW, BLUE, GREEN};
+
 #define NUMBER_OF_VERIFICATIONS 2
 int num_ver = 0;
 
@@ -386,11 +388,30 @@ void loop() {
 
          if (buttonBPushed == true) {
            if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-             zowi.putMouth(smile);
+             bool test = true;
 
-             for (int i = 0; i < color_index; i++) {
+             //zowi.putMouth(smile);
+
+             /*for (int i = 0; i < color_index; i++) {
                executeOrder(color_orders[i]);
+             }*/
+
+             for (int i = 0; i < 5; i ++) {
+               for (int j = 0; j < 9; j++) {
+                 if (color_orders[j + (i * 9)] != test_sequence[j]) {
+                   test = false;
+                   break;
+                 }
+               }
+
+               if (test == false)
+                 break;
              }
+
+             if (test)
+               zowi.putMouth(smile);
+             else
+               zowi.putMouth(sad);
 
              buttonBPushed=false;
            } else {
@@ -472,27 +493,27 @@ void loop() {
              zowi.forward(10);
              loops = 0;
              state = MOVESTRAIGHT;
-             zowi.putMouth(smile);
+             //zowi.putMouth(smile);
            } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
              zowi.left(10);
              loops = 0;
              state = MOVELEFT;
-             zowi.putMouth(smile);
+             //zowi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
              zowi.right(10);
              loops = 0;
              state = MOVERIGHT;
-             zowi.putMouth(smile);
+             //zowi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
              if (loops <= MAX_LOOPS) {
                if (state == MOVERIGHT) {
                  zowi.right(10);
                  loops++;
-                 zowi.putMouth(smile);
+                 //zowi.putMouth(smile);
                } else if (state == MOVELEFT) {
                  zowi.left(10);
                  loops++;
-                 zowi.putMouth(smile);
+                 //zowi.putMouth(smile);
                } else {
                  zowi.stop(10);
                  loops = 0;
