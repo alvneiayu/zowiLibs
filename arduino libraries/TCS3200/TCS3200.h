@@ -8,10 +8,10 @@
 #define TCS3200_DETECT   3
 #define TCS3200_WAIT     4
 
-static int _g_count;
+static unsigned int _g_count;
 static int _g_flag;
 static float _scaleFactor[3] = {-1, -1, -1};
-static int _freqValues[3];
+static unsigned int _freqValues[3];
 static int _RGBstatus;
 static int _pinS2;
 static int _pinS3;
