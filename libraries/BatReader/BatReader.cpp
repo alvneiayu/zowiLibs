@@ -1,5 +1,5 @@
 /******************************************************************************
-* Zowi Battery Reader Library
+* Rombi Battery Reader Library
 * 
 * @version 20150831
 * @author Raul de Pablos Martin

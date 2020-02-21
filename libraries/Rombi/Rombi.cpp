@@ -7,20 +7,20 @@
 #endif
 
 
-#include "Zowi.h"
+#include "Rombi.h"
 #include <Oscillator.h>
 #include <US.h>
 #include <IR.h>
 #include <TCS3200.h>
 
 
-void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight, int LeftEncoder, int RightEncoder) {
+void Rombi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight, int LeftEncoder, int RightEncoder) {
   
   servo_pins[0] = RL;
   servo_pins[1] = RR;
 
   attachServos();
-  isZowiResting=false;
+  isRombiResting=false;
 
   if (load_calibration) {
     for (int i = 0; i < 2; i++) {
@@ -57,12 +57,12 @@ void Zowi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzz
 ///////////////////////////////////////////////////////////////////
 //-- ATTACH & DETACH FUNCTIONS ----------------------------------//
 ///////////////////////////////////////////////////////////////////
-void Zowi::attachServos(){
+void Rombi::attachServos(){
     servo[0].attach(servo_pins[0]);
     servo[1].attach(servo_pins[1]);
 }
 
-void Zowi::detachServos(){
+void Rombi::detachServos(){
     servo[0].detach();
     servo[1].detach();
 }
@@ -70,12 +70,12 @@ void Zowi::detachServos(){
 ///////////////////////////////////////////////////////////////////
 //-- OSCILLATORS TRIMS ------------------------------------------//
 ///////////////////////////////////////////////////////////////////
-void Zowi::setTrims(int YL, int YR, int RL, int RR) {
+void Rombi::setTrims(int YL, int YR, int RL, int RR) {
   servo[0].SetTrim(YL);
   servo[1].SetTrim(YR);
 }
 
-void Zowi::saveTrimsOnEEPROM() {
+void Rombi::saveTrimsOnEEPROM() {
   
   for (int i = 0; i < 4; i++){ 
       EEPROM.write(i, servo[i].getTrim());
@@ -87,7 +87,7 @@ void Zowi::saveTrimsOnEEPROM() {
 ///////////////////////////////////////////////////////////////////
 //-- BASIC MOTION FUNCTIONS -------------------------------------//
 ///////////////////////////////////////////////////////////////////
-void Zowi::_moveServos(int time, int  servo_target[]) {
+void Rombi::_moveServos(int time, int  servo_target[]) {
 
   attachServos();
   if(getRestState()==true){
@@ -111,28 +111,28 @@ void Zowi::_moveServos(int time, int  servo_target[]) {
 
 
 ///////////////////////////////////////////////////////////////////
-//-- HOME = Zowi at rest position -------------------------------//
+//-- HOME = Rombi at rest position -------------------------------//
 ///////////////////////////////////////////////////////////////////
-void Zowi::home(){
+void Rombi::home(){
 
-  if(isZowiResting==false){ //Go to rest position only if necessary
+  if(isRombiResting==false){ //Go to rest position only if necessary
 
     int homes[2]={90, 90}; //All the servos at rest position
     _moveServos(500,homes);   //Move the servos in half a second
 
     detachServos();
-    isZowiResting=true;
+    isRombiResting=true;
   }
 }
 
-bool Zowi::getRestState(){
+bool Rombi::getRestState(){
 
-    return isZowiResting;
+    return isRombiResting;
 }
 
-void Zowi::setRestState(bool state){
+void Rombi::setRestState(bool state){
 
-    isZowiResting = state;
+    isRombiResting = state;
 }
 
 
@@ -141,71 +141,71 @@ void Zowi::setRestState(bool state){
 ///////////////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-//-- Zowi movement: left
+//-- Rombi movement: left
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::left(int T) {
+void Rombi::left(int T) {
   int left[]={97, 86};
   _moveServos(T, left);
 }
 
 //---------------------------------------------------------
-//-- Zowi movement: right
+//-- Rombi movement: right
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::right(int T) {
+void Rombi::right(int T) {
   int right[]={99, 88};
   _moveServos(T, right);
 }
 
 //---------------------------------------------------------
-//-- Zowi movement: forward
+//-- Rombi movement: forward
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::forward(int T) {
+void Rombi::forward(int T) {
   int forward[]={97, 88};
   _moveServos(T, forward);
 }
 
 //---------------------------------------------------------
-//-- Zowi movement: back
+//-- Rombi movement: back
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::back(int T) {
+void Rombi::back(int T) {
   int back[]={83, 100};
   _moveServos(T, back);
 }
 
 //---------------------------------------------------------
-//-- Zowi movement: stop
+//-- Rombi movement: stop
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::stop(int T) {
+void Rombi::stop(int T) {
   int stop[]={90, 90};
   _moveServos(T, stop);
 }
 
 //---------------------------------------------------------
-//-- Zowi movement: left_order
+//-- Rombi movement: left_order
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::left_order(int T) {
+void Rombi::left_order(int T) {
   int left_order[]={85, 85};
   _moveServos(T, left_order);
 }
 
 //---------------------------------------------------------
-//-- Zowi movement: right_order
+//-- Rombi movement: right_order
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Zowi::right_order(int T) {
+void Rombi::right_order(int T) {
   int right_order[]={100, 100};
   _moveServos(T, right_order);
 }
@@ -215,18 +215,18 @@ void Zowi::right_order(int T) {
 ///////////////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-//-- Zowi getDistance: return zowi's ultrasonic sensor measure
+//-- Rombi getDistance: return rombi's ultrasonic sensor measure
 //---------------------------------------------------------
-float Zowi::getDistance(){
+float Rombi::getDistance(){
 
   return us.read();
 }
 
 
 //---------------------------------------------------------
-//-- Zowi getNoise: return zowi's noise sensor measure
+//-- Rombi getNoise: return rombi's noise sensor measure
 //---------------------------------------------------------
-int Zowi::getNoise(){
+int Rombi::getNoise(){
 
   int noiseLevel = 0;
   int noiseReadings = 0;
@@ -245,9 +245,9 @@ int Zowi::getNoise(){
 }
 
 //---------------------------------------------------------
-//-- Zowi getIR: return zowi's IR sensor val
+//-- Rombi getIR: return rombi's IR sensor val
 //---------------------------------------------------------
-uint8_t Zowi::getIR(int side) {
+uint8_t Rombi::getIR(int side) {
     if (side == LEFT) {
         return ir_left.read();
     } else {
@@ -256,9 +256,9 @@ uint8_t Zowi::getIR(int side) {
 }
 
 //---------------------------------------------------------
-//-- Zowi getRGB: return zowi's RGB sensor val
+//-- Rombi getRGB: return rombi's RGB sensor val
 //---------------------------------------------------------
-int Zowi::getRGB(int *RGBValues) {
+int Rombi::getRGB(int *RGBValues) {
     rgb_detector.attach();
     if (rgb_detector.read(RGBValues)) {
         rgb_detector.detach();
@@ -269,9 +269,9 @@ int Zowi::getRGB(int *RGBValues) {
 }
 
 //---------------------------------------------------------
-//-- Zowi getEncLap: return zowi's Encoder Lap val
+//-- Rombi getEncLap: return rombi's Encoder Lap val
 //---------------------------------------------------------
-int Zowi::getEncLap(int side) {
+int Rombi::getEncLap(int side) {
     if (side == LEFT) {
         return left_encoder.getLap();
     } else {
@@ -280,9 +280,9 @@ int Zowi::getEncLap(int side) {
 }
 
 //---------------------------------------------------------
-//-- Zowi getEncRead: return zowi's Encoder val
+//-- Rombi getEncRead: return rombi's Encoder val
 //---------------------------------------------------------
-int Zowi::getEncVal(int side) {
+int Rombi::getEncVal(int side) {
     if (side == LEFT) {
         return left_encoder.read();
     } else {
@@ -291,9 +291,9 @@ int Zowi::getEncVal(int side) {
 }
 
 //---------------------------------------------------------
-//-- Zowi getBatteryLevel: return battery voltage percent
+//-- Rombi getBatteryLevel: return battery voltage percent
 //---------------------------------------------------------
-double Zowi::getBatteryLevel(){
+double Rombi::getBatteryLevel(){
 
   //The first read of the batery is often a wrong reading, so we will discard this value. 
     double batteryLevel = battery.readBatPercent();
@@ -311,7 +311,7 @@ double Zowi::getBatteryLevel(){
 }
 
 
-double Zowi::getBatteryVoltage(){
+double Rombi::getBatteryVoltage(){
 
   //The first read of the batery is often a wrong reading, so we will discard this value. 
     double batteryLevel = battery.readBatVoltage();
@@ -333,7 +333,7 @@ double Zowi::getBatteryVoltage(){
 //-- MOUTHS & ANIMATIONS ----------------------------------------//
 ///////////////////////////////////////////////////////////////////
 
-unsigned long int Zowi::getMouthShape(int number){
+unsigned long int Rombi::getMouthShape(int number){
   unsigned long int types []={zero_code,one_code,two_code,three_code,four_code,five_code,six_code,seven_code,eight_code,
   nine_code,smile_code,happyOpen_code,happyClosed_code,heart_code,bigSurprise_code,smallSurprise_code,tongueOut_code,
   vamp1_code,vamp2_code,lineMouth_code,confused_code,diagonal_code,sad_code,sadOpen_code,sadClosed_code,
@@ -343,7 +343,7 @@ unsigned long int Zowi::getMouthShape(int number){
 }
 
 
-unsigned long int Zowi::getAnimShape(int anim, int index){
+unsigned long int Rombi::getAnimShape(int anim, int index){
 
   unsigned long int littleUuh_code[]={
      0b00000000000000001100001100000000,
@@ -403,13 +403,13 @@ unsigned long int Zowi::getAnimShape(int anim, int index){
 }
 
 
-void Zowi::putAnimationMouth(unsigned long int aniMouth, int index){
+void Rombi::putAnimationMouth(unsigned long int aniMouth, int index){
 
       ledmatrix.writeFull(getAnimShape(aniMouth,index));
 }
 
 
-void Zowi::putMouth(unsigned long int mouth, bool predefined){
+void Rombi::putMouth(unsigned long int mouth, bool predefined){
 
   if (predefined){
     ledmatrix.writeFull(getMouthShape(mouth));
@@ -420,7 +420,7 @@ void Zowi::putMouth(unsigned long int mouth, bool predefined){
 }
 
 
-void Zowi::clearMouth(){
+void Rombi::clearMouth(){
 
   ledmatrix.clearMatrix();
 }
@@ -430,21 +430,21 @@ void Zowi::clearMouth(){
 //-- SOUNDS -----------------------------------------------------//
 ///////////////////////////////////////////////////////////////////
 
-void Zowi::_tone (float noteFrequency, long noteDuration, int silentDuration){
+void Rombi::_tone (float noteFrequency, long noteDuration, int silentDuration){
 
     // tone(10,261,500);
     // delay(500);
 
       if(silentDuration==0){silentDuration=1;}
 
-      tone(Zowi::pinBuzzer, noteFrequency, noteDuration);
+      tone(Rombi::pinBuzzer, noteFrequency, noteDuration);
       delay(noteDuration);       //milliseconds to microseconds
       //noTone(PIN_Buzzer);
       delay(silentDuration);     
 }
 
 
-void Zowi::bendTones (float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration){
+void Rombi::bendTones (float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration){
 
   //Examples:
   //  bendTones (880, 2093, 1.02, 18, 1);
@@ -467,7 +467,7 @@ void Zowi::bendTones (float initFrequency, float finalFrequency, float prop, lon
 }
 
 
-void Zowi::sing(int songName){
+void Rombi::sing(int songName){
   switch(songName){
 
     case S_connection:
@@ -585,7 +585,7 @@ void Zowi::sing(int songName){
 //-- GESTURES ---------------------------------------------------//
 ///////////////////////////////////////////////////////////////////
 
-void Zowi::playGesture(int gesture){
+void Rombi::playGesture(int gesture){
 
   int sadPos[4]=      {110, 70, 20, 160};
   int bedPos[4]=      {100, 80, 60, 120};
@@ -604,7 +604,7 @@ void Zowi::playGesture(int gesture){
   
   switch(gesture){
 
-    case ZowiHappy: 
+    case RombiHappy: 
         _tone(note_E5,50,30);
         putMouth(smile);
         sing(S_happy_short);
@@ -615,7 +615,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiSuperHappy:
+    case RombiSuperHappy:
         putMouth(happyOpen);
         sing(S_happy);
         putMouth(happyClosed);
@@ -628,7 +628,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiSad: 
+    case RombiSad: 
         putMouth(sad);
         bendTones(880, 830, 1.02, 20, 200);
         putMouth(sadClosed);
@@ -648,7 +648,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiSleeping:
+    case RombiSleeping:
 
         for(int i=0; i<4;i++){
           putAnimationMouth(dreamMouth,0);
@@ -673,7 +673,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiFart:
+    case RombiFart:
         delay(300);     
         putMouth(lineMouth);
         sing(S_fart1);  
@@ -696,7 +696,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiConfused:
+    case RombiConfused:
         putMouth(confused);
         sing(S_confused);
         delay(500);
@@ -706,7 +706,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiLove:
+    case RombiLove:
         putMouth(heart);
         sing(S_cuddly);
 
@@ -716,7 +716,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiAngry: 
+    case RombiAngry: 
         putMouth(angry);
 
         _tone(note_A5,100,30);
@@ -734,7 +734,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiFretful: 
+    case RombiFretful: 
         putMouth(angry);
         bendTones(note_A5, note_D6, 1.02, 20, 4);
         bendTones(note_A5, note_E5, 1.02, 20, 4);
@@ -753,7 +753,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiMagic:
+    case RombiMagic:
 
         //Initial note frecuency = 400
         //Final note frecuency = 1000
@@ -784,7 +784,7 @@ void Zowi::playGesture(int gesture){
     break;
 
 
-    case ZowiWave:
+    case RombiWave:
         
         // Reproduce the animation four times
         for(int i = 0; i<2; i++){ 
@@ -818,7 +818,7 @@ void Zowi::playGesture(int gesture){
         putMouth(happyOpen);
     break;
 
-    case ZowiVictory:
+    case RombiVictory:
         
         putMouth(smallSurprise);
         //final pos   = {90,90,150,30}
@@ -847,7 +847,7 @@ void Zowi::playGesture(int gesture){
 
     break;
 
-    case ZowiFail:
+    case RombiFail:
 
         putMouth(sadOpen);
         _tone(900,200,1);

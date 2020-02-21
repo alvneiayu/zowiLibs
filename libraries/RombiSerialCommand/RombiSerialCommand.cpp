@@ -10,14 +10,14 @@
 #include "WProgram.h"
 #endif
 
-#include "ZowiSerialCommand.h"
+#include "RombiSerialCommand.h"
 
 
 #include <string.h>
 
 
 // Constructor makes sure some things are set. 
-ZowiSerialCommand::ZowiSerialCommand()
+RombiSerialCommand::RombiSerialCommand()
 {
 	strncpy(delim," ",MAXDELIMETER);  // strtok_r needs a null-terminated string
 	term='\r';   // return character, default terminator for commands
@@ -30,7 +30,7 @@ ZowiSerialCommand::ZowiSerialCommand()
 //
 // Initialize the command buffer being processed to all null characters
 //
-void ZowiSerialCommand::clearBuffer()
+void RombiSerialCommand::clearBuffer()
 {
 	for (int i=0; i<SERIALCOMMANDBUFFER; i++) 
 	{
@@ -41,7 +41,7 @@ void ZowiSerialCommand::clearBuffer()
 
 // Retrieve the next token ("word" or "argument") from the Command buffer.  
 // returns a NULL if no more tokens exist.   
-char *ZowiSerialCommand::next() 
+char *RombiSerialCommand::next() 
 {
 	char *nextToken;
 	nextToken = strtok_r(NULL, delim, &last); 
@@ -51,10 +51,10 @@ char *ZowiSerialCommand::next()
 // This checks the Serial stream for characters, and assembles them into a buffer.  
 // When the terminator character (default '\r') is seen, it starts parsing the 
 // buffer for a prefix command, and calls handlers setup by addCommand() member
-void ZowiSerialCommand::readSerial() 
+void RombiSerialCommand::readSerial() 
 {
 	bool onlyOneCommand = true;
-	// If we're using the Hardware port, check it.   Otherwise check the user-created ZowiSoftwareSerial Port
+	// If we're using the Hardware port, check it.   Otherwise check the user-created RombiSoftwareSerial Port
 	while ((Serial.available() > 0)&&(onlyOneCommand==true))
 	{
 		int i; 
@@ -101,7 +101,7 @@ void ZowiSerialCommand::readSerial()
 // Adds a "command" and a handler function to the list of available commands.  
 // This is used for matching a found token in the buffer, and gives the pointer
 // to the handler function to deal with it. 
-void ZowiSerialCommand::addCommand(const char *command, void (*function)())
+void RombiSerialCommand::addCommand(const char *command, void (*function)())
 {
 	if (numCommand < MAXSERIALCOMMANDS) {
 				
@@ -113,7 +113,7 @@ void ZowiSerialCommand::addCommand(const char *command, void (*function)())
 
 // This sets up a handler to be called in the event that the receveived command string
 // isn't in the list of things with handlers.
-void ZowiSerialCommand::addDefaultHandler(void (*function)())
+void RombiSerialCommand::addDefaultHandler(void (*function)())
 {
 	defaultHandler = function;
 }

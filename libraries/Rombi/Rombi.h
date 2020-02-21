@@ -1,5 +1,5 @@
-#ifndef Zowi_h
-#define Zowi_h
+#ifndef Rombi_h
+#define Rombi_h
 
 #include <Servo.h>
 #include <Oscillator.h>
@@ -12,9 +12,9 @@
 #include <TCS3200.h>
 #include <ServoEncoder.h>
 
-#include "Zowi_mouths.h"
-#include "Zowi_sounds.h"
-#include "Zowi_gestures.h"
+#include "Rombi_mouths.h"
+#include "Rombi_sounds.h"
+#include "Rombi_gestures.h"
 
 
 //-- Constants
@@ -37,11 +37,11 @@
 #define SERVO_ENC_LEFT_PIN    A4
 #define SERVO_ENC_RIGHT_PIN   A5
 
-class Zowi
+class Rombi
 {
   public:
 
-    //-- Zowi initialization
+    //-- Rombi initialization
     void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo, int IRLeft=IR_LEFT_PIN, int IRRight=IR_RIGHT_PIN, int LeftEncoder=SERVO_ENC_LEFT_PIN, int RightEncoder=SERVO_ENC_RIGHT_PIN);
 
     //-- Attach & detach functions
@@ -56,7 +56,7 @@ class Zowi
     void _moveServos(int time, int  servo_target[]);
     void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
 
-    //-- HOME = Zowi at rest position
+    //-- HOME = Rombi at rest position
     void home();
     bool getRestState();
     void setRestState(bool state);
@@ -120,7 +120,7 @@ class Zowi
     unsigned long partial_time;
     float increment[4];
 
-    bool isZowiResting;
+    bool isRombiResting;
 
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);

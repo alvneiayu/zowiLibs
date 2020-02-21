@@ -6,8 +6,8 @@
 
 
 
-#ifndef ZowiSerialCommand_h
-#define ZowiSerialCommand_h
+#ifndef RombiSerialCommand_h
+#define RombiSerialCommand_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
@@ -25,10 +25,10 @@
 #define MAXSERIALCOMMANDS	14
 #define MAXDELIMETER 2
 
-class ZowiSerialCommand
+class RombiSerialCommand
 {
 	public:
-		ZowiSerialCommand();      // Constructor
+		RombiSerialCommand();      // Constructor
 
 		void clearBuffer();   // Sets the command buffer to all '\0' (nulls)
 		char *next();         // returns pointer to next token found in command buffer (for getting arguments to commands)
@@ -47,12 +47,12 @@ class ZowiSerialCommand
 		typedef struct _callback {
 			char command[SERIALCOMMANDBUFFER];
 			void (*function)();
-		} ZowiSerialCommandCallback;            // Data structure to hold Command/Handler function key-value pairs
+		} RombiSerialCommandCallback;            // Data structure to hold Command/Handler function key-value pairs
 		int numCommand;
-		ZowiSerialCommandCallback CommandList[MAXSERIALCOMMANDS];   // Actual definition for command/handler array
+		RombiSerialCommandCallback CommandList[MAXSERIALCOMMANDS];   // Actual definition for command/handler array
 		void (*defaultHandler)();           // Pointer to the default handler function 
-		int usingZowiSoftwareSerial;            // Used as boolean to see if we're using ZowiSoftwareSerial object or not
+		int usingRombiSoftwareSerial;            // Used as boolean to see if we're using RombiSoftwareSerial object or not
 
 };
 
-#endif //ZowiSerialCommand_h
+#endif //RombiSerialCommand_h

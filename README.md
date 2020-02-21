@@ -1,2 +1,2 @@
-# zowiLibs
-Repository that will store the production zowiLibs used in bitbloq
+# RombiLibs
+Repository that will store the production RombiLibs used in bitbloq

@@ -1,23 +1,23 @@
-#ifndef Zowi_gestures_h
-#define Zowi_gestures_h
+#ifndef Rombi_gestures_h
+#define Rombi_gestures_h
 
 //***********************************************************************************
 //*********************************GESTURE DEFINES***********************************
 //***********************************************************************************           
 
-#define ZowiHappy 		0
-#define ZowiSuperHappy 	1
-#define ZowiSad 		2
-#define ZowiSleeping 	3
-#define ZowiFart 		4
-#define ZowiConfused 	5
-#define ZowiLove 		6
-#define ZowiAngry 		7
-#define ZowiFretful 	8
-#define ZowiMagic 		9
-#define ZowiWave 		10
-#define ZowiVictory 	11
-#define ZowiFail 		12
+#define RombiHappy 		0
+#define RombiSuperHappy 	1
+#define RombiSad 		2
+#define RombiSleeping 	3
+#define RombiFart 		4
+#define RombiConfused 	5
+#define RombiLove 		6
+#define RombiAngry 		7
+#define RombiFretful 	8
+#define RombiMagic 		9
+#define RombiWave 		10
+#define RombiVictory 	11
+#define RombiFail 		12
 
 //*** MOUTH ANIMATIONS***
 #define littleUuh		0

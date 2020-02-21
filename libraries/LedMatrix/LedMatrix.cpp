@@ -1,5 +1,5 @@
 /******************************************************************************
-* Zowi LED Matrix Library
+* Rombi LED Matrix Library
 * 
 * @version 20150710
 * @author Raul de Pablos Martin

@@ -1,4 +1,4 @@
-ZowiSerialCommand	KEYWORD1
+RombiSerialCommand	KEYWORD1
 clearBuffer	KEYWORD2
 next	KEYWORD2
 readSerial	KEYWORD2

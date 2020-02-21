@@ -1,6 +1,6 @@
 
 //----------------------------------------------------------------
-//-- Zowi basic firmware v2
+//-- Rombi basic firmware v2
 //-- (c) BQ. Released under a GPL licencse
 //-- 04 December 2015
 //-- Authors:  Anita de Prado: ana.deprado@bq.com
@@ -10,7 +10,7 @@
 //--           Irene Sanz : irene.sanz@bq.com
 //--           Alvaro Neira : alvaro.neira@bq.com
 //-----------------------------------------------------------------
-//-- Experiment with all the features that Zowi has!
+//-- Experiment with all the features that Rombi has!
 //-----------------------------------------------------------------
 
 #include <Servo.h> 
@@ -21,12 +21,12 @@
 #include <LedMatrix.h>
 
 //-- Library to manage serial commands
-#include <ZowiSerialCommand.h>
-ZowiSerialCommand SCmd;  //The SerialCommand object
+#include <RombiSerialCommand.h>
+RombiSerialCommand SCmd;  //The SerialCommand object
 
-//-- Zowi Library
-#include <Zowi.h>
-Zowi zowi;  //This is Zowi!!
+//-- Rombi Library
+#include <Rombi.h>
+Rombi rombi;  //This is Rombi!!
  
 //---------------------------------------------------------
 //-- Configuration of pins where the servos are attached
@@ -44,7 +44,7 @@ RR => |-|               |-| <= RL
   #define PIN_RR 5 //servo[3]
 //---------------------------------------------------------
 
-//---Zowi Buttons
+//---Rombi Buttons
 #define PIN_SecondButton 6
 #define PIN_ThirdButton 7
 
@@ -54,7 +54,7 @@ RR => |-|               |-| <= RL
 //-- Global Variables -------------------------------------------//
 ///////////////////////////////////////////////////////////////////
 
-const char programID[]="ZOWI_BASE_v2"; //Each program will have a ID
+const char programID[]="ROMBI_BASE_v2"; //Each program will have a ID
 
 const char name_fac='$'; //Factory name
 const char name_fir='#'; //First name
@@ -74,14 +74,14 @@ typedef enum
 } State;
 
 //---------------------------------------------------------
-//-- Zowi has 5 modes:
-//--    * MODE = 0: Zowi is awaiting  
+//-- Rombi has 5 modes:
+//--    * MODE = 0: Rombi is awaiting  
 //--    * MODE = 1: Dancing mode!  
 //--    * MODE = 2: Obstacle detector mode  
 //--    * MODE = 3: Noise detector mode   
-//--    * MODE = 4: ZowiPAD or any Teleoperation mode (listening SerialPort). 
+//--    * MODE = 4: RombiPAD or any Teleoperation mode (listening SerialPort). 
 //---------------------------------------------------------
-volatile int MODE=1; //State of zowi in the principal state machine. 
+volatile int MODE=1; //State of rombi in the principal state machine. 
 
 volatile bool buttonPushed=false;  //Variable to remember when a button has been pushed
 volatile bool buttonAPushed=false; //Variable to remember when A button has been pushed
@@ -174,20 +174,20 @@ int executeOrder(int order) {
 
     switch (orders_color[i][1]) {
     case MOVESTRAIGHT:
-      zowi.forward(2000);
+      rombi.forward(2000);
       break;
     case MOVELEFT:
-      zowi.left_order(1010);
+      rombi.left_order(1010);
       break;
     case MOVERIGHT:
-      zowi.right_order(850);
+      rombi.right_order(850);
       break;
     case STOP:
-      zowi.stop(100);
+      rombi.stop(100);
       break;
     case MOVEBACK:
-      zowi.back(2500);
-      zowi.stop(100);
+      rombi.back(2500);
+      rombi.stop(100);
       break;
     default:
       break;
@@ -207,11 +207,11 @@ void setup(){
   pinMode(PIN_ThirdButton,INPUT);
   
   //Set the servo pins
-  zowi.init(PIN_RL,PIN_RR,false);
+  rombi.init(PIN_RL,PIN_RR,false);
  
   //Uncomment this to set the servo trims manually and save on EEPROM 
-    //zowi.setTrims(TRIM_YL, TRIM_YR, TRIM_RL, TRIM_RR);
-    //zowi.saveTrimsOnEEPROM(); //Uncomment this only for one upload when you finaly set the trims.
+    //rombi.setTrims(TRIM_YL, TRIM_YR, TRIM_RL, TRIM_RR);
+    //rombi.saveTrimsOnEEPROM(); //Uncomment this only for one upload when you finaly set the trims.
 
   //Set a random seed
   randomSeed(analogRead(A6));
@@ -235,19 +235,19 @@ void setup(){
 
 
 
-  //Zowi wake up!
-  //zowi.sing(S_connection);
-  zowi.home();
+  //Rombi wake up!
+  //rombi.sing(S_connection);
+  rombi.home();
 
 
-  //If Zowi's name is '&' (factory name) means that is the first time this program is executed.
-  //This first time, Zowi mustn't do anything. Just born at the factory!
+  //If Rombi's name is '&' (factory name) means that is the first time this program is executed.
+  //This first time, Rombi mustn't do anything. Just born at the factory!
   //5 = EEPROM address that contains first name character
   if (EEPROM.read(5)==name_fac){ 
 
     EEPROM.put(5, name_fir); //From now, the name is '#'
     EEPROM.put(6, '\0'); 
-    zowi.putMouth(culito);
+    rombi.putMouth(culito);
 
     while(true){    
        delay(1000);
@@ -255,7 +255,7 @@ void setup(){
   }  
 
 
-  //Send Zowi name, programID & battery level.
+  //Send Rombi name, programID & battery level.
   requestName();
   delay(50);
   requestProgramId();
@@ -263,7 +263,7 @@ void setup(){
   requestBattery();
   
   //Checking battery
-  ZowiLowBatteryAlarm();
+  RombiLowBatteryAlarm();
 
 
  // Animation Uuuuuh - A little moment of initial surprise
@@ -271,41 +271,41 @@ void setup(){
   for(int i=0; i<2; i++){
       for (int i=0;i<8;i++){
         if(buttonPushed){break;}  
-        zowi.putAnimationMouth(littleUuh,i);
+        rombi.putAnimationMouth(littleUuh,i);
         delay(150);
       }
   }
  //-----
 
 
-  //Smile for a happy Zowi :)
+  //Smile for a happy Rombi :)
   if(!buttonPushed){ 
-    zowi.putMouth(smile);
-    //zowi.sing(S_happy);
+    rombi.putMouth(smile);
+    //rombi.sing(S_happy);
     delay(200);
   }
 
 
-  //If Zowi's name is '#' means that Zowi hasn't been baptized
-  //In this case, Zowi does a longer greeting
+  //If Rombi's name is '#' means that Rombi hasn't been baptized
+  //In this case, Rombi does a longer greeting
   //5 = EEPROM address that contains first name character
   if (EEPROM.read(5)==name_fir){ 
 
     if(!buttonPushed){  
-        zowi.back(0.5);
-        zowi.forward(0.5);
+        rombi.back(0.5);
+        rombi.forward(0.5);
         delay(200); 
     }
 
     if(!buttonPushed){ 
-        zowi.putMouth(smallSurprise);
-        zowi.home();
+        rombi.putMouth(smallSurprise);
+        rombi.home();
     }  
   }
 
 
   if(!buttonPushed){ 
-    zowi.putMouth(happyOpen);
+    rombi.putMouth(happyOpen);
   }
 
   previousMillis = millis();
@@ -322,7 +322,7 @@ void loop() {
   if (Serial.available()>0 && MODE!=3){
 
     MODE=1;
-    //zowi.putMouth(happyOpen);
+    //rombi.putMouth(happyOpen);
 
     buttonPushed=false;
   }
@@ -330,13 +330,13 @@ void loop() {
   //First attemp to initial software
   if (buttonPushed){  
 
-    zowi.home();
+    rombi.home();
 
     delay(100); //Wait for all buttons 
-    //zowi.sing(S_buttonPushed);
+    //rombi.sing(S_buttonPushed);
     delay(200); //Wait for all buttons 
 
-    zowi.putMouth(MODE);
+    rombi.putMouth(MODE);
  
     int showTime = 2000;
     while((showTime>0)){ //Wait to show the MODE number 
@@ -345,7 +345,7 @@ void loop() {
         delay(10);
     }
      
-    //zowi.putMouth(happyOpen);
+    //rombi.putMouth(happyOpen);
 
     buttonPushed=false;
 
@@ -353,13 +353,13 @@ void loop() {
 
     switch (MODE) {
 
-      //-- MODE 0 - Zowi is awaiting
+      //-- MODE 0 - Rombi is awaiting
       //---------------------------------------------------------
       case 0:
       
-        //Every 80 seconds in this mode, Zowi falls asleep 
+        //Every 80 seconds in this mode, Rombi falls asleep 
         if (millis()-previousMillis>=80000){
-            ZowiSleeping_withInterrupts(); //ZZzzzzz...
+            RombiSleeping_withInterrupts(); //ZZzzzzz...
             previousMillis=millis();         
         }
 
@@ -390,7 +390,7 @@ void loop() {
            if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
              bool test = true;
 
-             //zowi.putMouth(smile);
+             //rombi.putMouth(smile);
 
              /*for (int i = 0; i < color_index; i++) {
                executeOrder(color_orders[i]);
@@ -409,18 +409,18 @@ void loop() {
              }
 
              if (test)
-               zowi.putMouth(smile);
+               rombi.putMouth(smile);
              else
-               zowi.putMouth(sad);
+               rombi.putMouth(sad);
 
              buttonBPushed=false;
            } else {
-             zowi.putMouth(interrogation);
+             rombi.putMouth(interrogation);
              buttonBPushed=false;
              return;
            }
          } else if (buttonAPushed == true) {
-           if (zowi.getRGB(RGBValues)) {
+           if (rombi.getRGB(RGBValues)) {
              col = returnColor(RGBValues);
              if (col >= 0 && col != WHITE) {
                if (color_index > 0) {
@@ -473,58 +473,58 @@ void loop() {
                  num_ver = 0;
 
                  if (col == RED) {
-                   zowi.putMouth(one);
+                   rombi.putMouth(one);
                  } else if (col == GREEN) {
-                   zowi.putMouth(two);
+                   rombi.putMouth(two);
                  } else if (col == YELLOW) {
-                   zowi.putMouth(three);
+                   rombi.putMouth(three);
                  } else if (col == BLUE) {
-                   zowi.putMouth(four);
+                   rombi.putMouth(four);
                  } else if (col == BLACK) {
-                   zowi.putMouth(five);
+                   rombi.putMouth(five);
                  }
                }
              }
            }
 
-           sensorLeft = zowi.getIR(LEFT);
-           sensorRight = zowi.getIR(RIGHT);
+           sensorLeft = rombi.getIR(LEFT);
+           sensorRight = rombi.getIR(RIGHT);
            if ((sensorLeft == LOW) && (sensorRight == LOW)) {
-             zowi.forward(5);
+             rombi.forward(5);
              loops = 0;
              state = MOVESTRAIGHT;
-             //zowi.putMouth(smile);
+             //rombi.putMouth(smile);
            } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
-             zowi.left(5);
+             rombi.left(5);
              loops = 0;
              state = MOVELEFT;
-             //zowi.putMouth(smile);
+             //rombi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
-             zowi.right(5);
+             rombi.right(5);
              loops = 0;
              state = MOVERIGHT;
-             //zowi.putMouth(smile);
+             //rombi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
              if (loops <= MAX_LOOPS) {
                if (state == MOVERIGHT) {
-                 zowi.right(5);
+                 rombi.right(5);
                  loops++;
-                 //zowi.putMouth(smile);
+                 //rombi.putMouth(smile);
                } else if (state == MOVELEFT) {
-                 zowi.left(5);
+                 rombi.left(5);
                  loops++;
-                 //zowi.putMouth(smile);
+                 //rombi.putMouth(smile);
                } else {
-                 zowi.stop(5);
+                 rombi.stop(5);
                  loops = 0;
                  state = STOP;
-                 zowi.putMouth(sad);
+                 rombi.putMouth(sad);
                }
              } else {
-               zowi.stop(5);
+               rombi.stop(5);
                loops = 0;
                state = STOP;
-               zowi.putMouth(sad);
+               rombi.putMouth(sad);
                color_orders[color_index] = BLACK;
                color_index = color_index + 1;
              }
@@ -534,11 +534,11 @@ void loop() {
            }
          } else {
            if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-             zowi.stop(10);
-             zowi.putMouth(smile);
+             rombi.stop(10);
+             rombi.putMouth(smile);
            } else {
-             zowi.stop(10);
-             zowi.putMouth(sad);
+             rombi.stop(10);
+             rombi.putMouth(sad);
            }
          }
 
@@ -547,7 +547,7 @@ void loop() {
       case 2: //Calibration RGB
         char buf[200];
         
-        if (zowi.getRGB(RGBValues)) {
+        if (rombi.getRGB(RGBValues)) {
           col = returnColor(RGBValues);
           for (int i = 0; i < 3; i++) {
             sprintf(buf, "RGB[%d] = %d", i, RGBValues[i]);
@@ -555,29 +555,29 @@ void loop() {
           }
 
           if (col == RED) {
-            zowi.putMouth(one);
+            rombi.putMouth(one);
           } else if (col == GREEN) {
-            zowi.putMouth(two);
+            rombi.putMouth(two);
           } else if (col == YELLOW) {
-            zowi.putMouth(three);
+            rombi.putMouth(three);
           } else if (col == BLUE) {
-            zowi.putMouth(four);
+            rombi.putMouth(four);
           } else if (col == BLACK) {
-            zowi.putMouth(five);
+            rombi.putMouth(five);
           } else if (col == WHITE) {
-            zowi.putMouth(six);
+            rombi.putMouth(six);
           }
         }
       break;
 
-      //-- MODE 2 - ZowiPAD or any Teleoperation mode (listening SerialPort) 
+      //-- MODE 2 - RombiPAD or any Teleoperation mode (listening SerialPort) 
       //---------------------------------------------------------
       case 3:
 
         SCmd.readSerial();
         
-        //If Zowi is moving yet
-        if (zowi.getRestState()==false){  
+        //If Rombi is moving yet
+        if (rombi.getRestState()==false){  
           move(moveId);
         }
       
@@ -602,7 +602,7 @@ void loop() {
 //-- Function to read distance sensor & to actualize obstacleDetected variable
 void obstacleDetector(){
 
-   int distance = zowi.getDistance();
+   int distance = rombi.getDistance();
 
         if(distance<15){
           obstacleDetected = true;
@@ -616,7 +616,7 @@ void obstacleDetector(){
 void receiveStop(){
 
     sendAck();
-    zowi.home();
+    rombi.home();
     sendFinalAck();
 
 }
@@ -627,7 +627,7 @@ void receiveLED(){
 
     //sendAck & stop if necessary
     sendAck();
-    zowi.home();
+    rombi.home();
 
     //Examples of receiveLED Bluetooth commands
     //L 000000001000010100100011000000000
@@ -639,11 +639,11 @@ void receiveLED(){
     //Serial.println (arg);
     if (arg != NULL) {
       matrix=strtoul(arg,&endstr,2);    // Converts a char string to unsigned long integer
-      zowi.putMouth(matrix,false);
+      rombi.putMouth(matrix,false);
     }else{
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
     }
 
     sendFinalAck();
@@ -656,7 +656,7 @@ void recieveBuzzer(){
   
     //sendAck & stop if necessary
     sendAck();
-    zowi.home(); 
+    rombi.home(); 
 
     bool error = false; 
     int frec;
@@ -673,13 +673,13 @@ void recieveBuzzer(){
 
     if(error==true){
 
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
 
     }else{ 
 
-      zowi._tone(frec, duration, 1);   
+      rombi._tone(frec, duration, 1);   
     }
 
     sendFinalAck();
@@ -692,7 +692,7 @@ void receiveTrims(){
 
     //sendAck & stop if necessary
     sendAck();
-    zowi.home(); 
+    rombi.home(); 
 
     int trim_YL,trim_YR,trim_RL,trim_RR;
 
@@ -720,13 +720,13 @@ void receiveTrims(){
     
     if(error==true){
 
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
 
     }else{ //Save it on EEPROM
-      zowi.setTrims(trim_YL, trim_YR, trim_RL, trim_RR);
-      zowi.saveTrimsOnEEPROM(); //Uncomment this only for one upload when you finaly set the trims.
+      rombi.setTrims(trim_YL, trim_YR, trim_RL, trim_RR);
+      rombi.saveTrimsOnEEPROM(); //Uncomment this only for one upload when you finaly set the trims.
     } 
 
     sendFinalAck();
@@ -766,14 +766,14 @@ void receiveServo(){
     
     if(error==true){
 
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
 
     }else{ //Update Servo:
 
       int servoPos[4]={servo_YL, servo_YR, servo_RL, servo_RR}; 
-      zowi._moveServos(200, servoPos);   //Move 200ms
+      rombi._moveServos(200, servoPos);   //Move 200ms
       
     }
 
@@ -787,8 +787,8 @@ void receiveMovement(){
 
     sendAck();
 
-    if (zowi.getRestState()==true){
-        zowi.setRestState(false);
+    if (rombi.getRestState()==true){
+        rombi.setRestState(false);
     }
 
     //Definition of Movement Bluetooth commands
@@ -797,9 +797,9 @@ void receiveMovement(){
     arg = SCmd.next(); 
     if (arg != NULL) {moveId=atoi(arg);}
     else{
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
       moveId=0; //stop
     }
     
@@ -824,19 +824,19 @@ void move(int moveId){
 
   switch (moveId) {
     case 0:
-      zowi.home();
+      rombi.home();
       break;
     case 1: //M 1 1000 
-      zowi.left(T);
+      rombi.left(T);
       break;
     case 2: //M 2 1000 
-      zowi.right(T);
+      rombi.right(T);
       break;
     case 3: //M 3 1000 
-      zowi.forward(T);
+      rombi.forward(T);
       break;
     case 4: //M 4 1000 
-      zowi.back(T);
+      rombi.back(T);
       break;
     default:
         manualMode = true;
@@ -855,7 +855,7 @@ void receiveGesture(){
 
     //sendAck & stop if necessary
     sendAck();
-    zowi.home(); 
+    rombi.home(); 
 
     //Definition of Gesture Bluetooth commands
     //H  GestureID  
@@ -865,50 +865,50 @@ void receiveGesture(){
     if (arg != NULL) {gesture=atoi(arg);}
     else 
     {
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
     }
 
     switch (gesture) {
       case 1: //H 1 
-        zowi.playGesture(ZowiHappy);
+        rombi.playGesture(RombiHappy);
         break;
       case 2: //H 2 
-        zowi.playGesture(ZowiSuperHappy);
+        rombi.playGesture(RombiSuperHappy);
         break;
       case 3: //H 3 
-        zowi.playGesture(ZowiSad);
+        rombi.playGesture(RombiSad);
         break;
       case 4: //H 4 
-        zowi.playGesture(ZowiSleeping);
+        rombi.playGesture(RombiSleeping);
         break;
       case 5: //H 5  
-        zowi.playGesture(ZowiFart);
+        rombi.playGesture(RombiFart);
         break;
       case 6: //H 6 
-        zowi.playGesture(ZowiConfused);
+        rombi.playGesture(RombiConfused);
         break;
       case 7: //H 7 
-        zowi.playGesture(ZowiLove);
+        rombi.playGesture(RombiLove);
         break;
       case 8: //H 8 
-        zowi.playGesture(ZowiAngry);
+        rombi.playGesture(RombiAngry);
         break;
       case 9: //H 9  
-        zowi.playGesture(ZowiFretful);
+        rombi.playGesture(RombiFretful);
         break;
       case 10: //H 10
-        zowi.playGesture(ZowiMagic);
+        rombi.playGesture(RombiMagic);
         break;  
       case 11: //H 11
-        zowi.playGesture(ZowiWave);
+        rombi.playGesture(RombiWave);
         break;   
       case 12: //H 12
-        zowi.playGesture(ZowiVictory);
+        rombi.playGesture(RombiVictory);
         break; 
       case 13: //H 13
-        zowi.playGesture(ZowiFail);
+        rombi.playGesture(RombiFail);
         break;         
       default:
         break;
@@ -922,7 +922,7 @@ void receiveSing(){
 
     //sendAck & stop if necessary
     sendAck();
-    zowi.home(); 
+    rombi.home(); 
 
     //Definition of Sing Bluetooth commands
     //K  SingID    
@@ -932,68 +932,68 @@ void receiveSing(){
     if (arg != NULL) {sing=atoi(arg);}
     else 
     {
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
     }
 
     switch (sing) {
       case 1: //K 1 
-        zowi.sing(S_connection);
+        rombi.sing(S_connection);
         break;
       case 2: //K 2 
-        zowi.sing(S_disconnection);
+        rombi.sing(S_disconnection);
         break;
       case 3: //K 3 
-        zowi.sing(S_surprise);
+        rombi.sing(S_surprise);
         break;
       case 4: //K 4 
-        zowi.sing(S_OhOoh);
+        rombi.sing(S_OhOoh);
         break;
       case 5: //K 5  
-        zowi.sing(S_OhOoh2);
+        rombi.sing(S_OhOoh2);
         break;
       case 6: //K 6 
-        zowi.sing(S_cuddly);
+        rombi.sing(S_cuddly);
         break;
       case 7: //K 7 
-        zowi.sing(S_sleeping);
+        rombi.sing(S_sleeping);
         break;
       case 8: //K 8 
-        zowi.sing(S_happy);
+        rombi.sing(S_happy);
         break;
       case 9: //K 9  
-        zowi.sing(S_superHappy);
+        rombi.sing(S_superHappy);
         break;
       case 10: //K 10
-        zowi.sing(S_happy_short);
+        rombi.sing(S_happy_short);
         break;  
       case 11: //K 11
-        zowi.sing(S_sad);
+        rombi.sing(S_sad);
         break;   
       case 12: //K 12
-        zowi.sing(S_confused);
+        rombi.sing(S_confused);
         break; 
       case 13: //K 13
-        zowi.sing(S_fart1);
+        rombi.sing(S_fart1);
         break;
       case 14: //K 14
-        zowi.sing(S_fart2);
+        rombi.sing(S_fart2);
         break;
       case 15: //K 15
-        zowi.sing(S_fart3);
+        rombi.sing(S_fart3);
         break;    
       case 16: //K 16
-        zowi.sing(S_mode1);
+        rombi.sing(S_mode1);
         break; 
       case 17: //K 17
-        zowi.sing(S_mode2);
+        rombi.sing(S_mode2);
         break; 
       case 18: //K 18
-        zowi.sing(S_mode3);
+        rombi.sing(S_mode3);
         break;   
       case 19: //K 19
-        zowi.sing(S_buttonPushed);
+        rombi.sing(S_buttonPushed);
         break;                      
       default:
         break;
@@ -1008,29 +1008,29 @@ void receiveName(){
 
     //sendAck & stop if necessary
     sendAck();
-    zowi.home(); 
+    rombi.home(); 
 
-    char newZowiName[11] = "";  //Variable to store data read from Serial.
+    char newRombiName[11] = "";  //Variable to store data read from Serial.
     int eeAddress = 5;          //Location we want the data to be in EEPROM.
     char *arg; 
     arg = SCmd.next(); 
     
     if (arg != NULL) {
 
-      //Complete newZowiName char string
+      //Complete newRombiName char string
       int k = 0;
       while((*arg) && (k<11)){ 
-          newZowiName[k]=*arg++;
+          newRombiName[k]=*arg++;
           k++;
       }
       
-      EEPROM.put(eeAddress, newZowiName); 
+      EEPROM.put(eeAddress, newRombiName); 
     }
     else 
     {
-      zowi.putMouth(xMouth);
+      rombi.putMouth(xMouth);
       delay(2000);
-      zowi.clearMouth();
+      rombi.clearMouth();
     }
 
     sendFinalAck();
@@ -1038,20 +1038,20 @@ void receiveName(){
 }
 
 
-//-- Function to send Zowi's name
+//-- Function to send Rombi's name
 void requestName(){
 
-    zowi.home(); //stop if necessary
+    rombi.home(); //stop if necessary
 
-    char actualZowiName[11]= "";  //Variable to store data read from EEPROM.
+    char actualRombiName[11]= "";  //Variable to store data read from EEPROM.
     int eeAddress = 5;            //EEPROM address to start reading from
 
     //Get the float data from the EEPROM at position 'eeAddress'
-    EEPROM.get(eeAddress, actualZowiName);
+    EEPROM.get(eeAddress, actualRombiName);
 
     Serial.print(F("&&"));
     Serial.print(F("E "));
-    Serial.print(actualZowiName);
+    Serial.print(actualRombiName);
     Serial.println(F("%%"));
     Serial.flush();
 }
@@ -1060,9 +1060,9 @@ void requestName(){
 //-- Function to send ultrasonic sensor measure (distance in "cm")
 void requestDistance(){
 
-    zowi.home();  //stop if necessary  
+    rombi.home();  //stop if necessary  
 
-    int distance = zowi.getDistance();
+    int distance = rombi.getDistance();
     Serial.print(F("&&"));
     Serial.print(F("D "));
     Serial.print(distance);
@@ -1074,9 +1074,9 @@ void requestDistance(){
 //-- Function to send noise sensor measure
 void requestNoise(){
 
-    zowi.home();  //stop if necessary
+    rombi.home();  //stop if necessary
 
-    int microphone= zowi.getNoise(); //analogRead(PIN_NoiseSensor);
+    int microphone= rombi.getNoise(); //analogRead(PIN_NoiseSensor);
     Serial.print(F("&&"));
     Serial.print(F("N "));
     Serial.print(microphone);
@@ -1088,10 +1088,10 @@ void requestNoise(){
 //-- Function to send battery voltage percent
 void requestBattery(){
 
-    zowi.home();  //stop if necessary
+    rombi.home();  //stop if necessary
 
     //The first read of the batery is often a wrong reading, so we will discard this value. 
-    double batteryLevel = zowi.getBatteryLevel();
+    double batteryLevel = rombi.getBatteryLevel();
 
     Serial.print(F("&&"));
     Serial.print(F("B "));
@@ -1104,7 +1104,7 @@ void requestBattery(){
 //-- Function to send program ID
 void requestProgramId(){
 
-    zowi.home();   //stop if necessary
+    rombi.home();   //stop if necessary
 
     Serial.print(F("&&"));
     Serial.print(F("I "));
@@ -1142,67 +1142,67 @@ void sendFinalAck(){
 //-- Functions with animatics
 //--------------------------------------------------------
 
-void ZowiLowBatteryAlarm(){
+void RombiLowBatteryAlarm(){
 
-    double batteryLevel = zowi.getBatteryLevel();
+    double batteryLevel = rombi.getBatteryLevel();
 
     if(batteryLevel<45){
         
       while(!buttonPushed){
 
-          zowi.putMouth(thunder);
-          zowi.bendTones (880, 2000, 1.04, 8, 3);  //A5 = 880
+          rombi.putMouth(thunder);
+          rombi.bendTones (880, 2000, 1.04, 8, 3);  //A5 = 880
           
           delay(30);
 
-          zowi.bendTones (2000, 880, 1.02, 8, 3);  //A5 = 880
-          zowi.clearMouth();
+          rombi.bendTones (2000, 880, 1.02, 8, 3);  //A5 = 880
+          rombi.clearMouth();
           delay(500);
       } 
     }
 }
 
-void ZowiSleeping_withInterrupts(){
+void RombiSleeping_withInterrupts(){
 
   int bedPos_0[4]={90, 90}; 
 
   if(!buttonPushed){
-    zowi._moveServos(700, bedPos_0);  
+    rombi._moveServos(700, bedPos_0);  
   }
 
   for(int i=0; i<4;i++){
 
     if(buttonPushed){break;}
-      zowi.putAnimationMouth(dreamMouth,0);
-      zowi.bendTones (100, 200, 1.04, 10, 10);
+      rombi.putAnimationMouth(dreamMouth,0);
+      rombi.bendTones (100, 200, 1.04, 10, 10);
     
     if(buttonPushed){break;}
-      zowi.putAnimationMouth(dreamMouth,1);
-      zowi.bendTones (200, 300, 1.04, 10, 10);  
+      rombi.putAnimationMouth(dreamMouth,1);
+      rombi.bendTones (200, 300, 1.04, 10, 10);  
 
     if(buttonPushed){break;}
-      zowi.putAnimationMouth(dreamMouth,2);
-      zowi.bendTones (300, 500, 1.04, 10, 10);   
+      rombi.putAnimationMouth(dreamMouth,2);
+      rombi.bendTones (300, 500, 1.04, 10, 10);   
 
     delay(500);
     
     if(buttonPushed){break;}
-      zowi.putAnimationMouth(dreamMouth,1);
-      zowi.bendTones (400, 250, 1.04, 10, 1); 
+      rombi.putAnimationMouth(dreamMouth,1);
+      rombi.bendTones (400, 250, 1.04, 10, 1); 
 
     if(buttonPushed){break;}
-      zowi.putAnimationMouth(dreamMouth,0);
-      zowi.bendTones (250, 100, 1.04, 10, 1); 
+      rombi.putAnimationMouth(dreamMouth,0);
+      rombi.bendTones (250, 100, 1.04, 10, 1); 
     
     delay(500);
   } 
 
   if(!buttonPushed){
-    zowi.putMouth(lineMouth);
-    zowi.sing(S_cuddly);
+    rombi.putMouth(lineMouth);
+    rombi.sing(S_cuddly);
   }
 
-  zowi.home();
-  if(!buttonPushed){zowi.putMouth(happyOpen);}  
+  rombi.home();
+  if(!buttonPushed){rombi.putMouth(happyOpen);}  
 
 }

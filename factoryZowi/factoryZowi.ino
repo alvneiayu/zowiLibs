@@ -1,5 +1,5 @@
 //----------------------------------------------------------------
-//-- helloZowi.ino
+//-- helloRombi.ino
 //-- (c) BQ. Released under a GPL licencse
 //-- September 2015
 //-- Author:  Anita de Prado: ana.deprado@bq.com
@@ -13,20 +13,20 @@
 #define xMouth_code  0b00100001010010001100010010100001
 #define okMouth_code 0b00000001000010010100001000000000
 
-//---Zowi Led Array Mouth
+//---Rombi Led Array Mouth
 #include <LedMatrix.h>
 
 LedMatrix ledmatrix(11, 13, 12);
 
-//Zowi
+//Rombi
 #include <Oscillator.h>
 #include <Servo.h>
 #include <EEPROM.h>
-#include <Zowi.h>
+#include <Rombi.h>
 
-Zowi zowi;
+Rombi rombi;
 
-//Zowi factory name
+//Rombi factory name
 char fac_name='$';
 int fac_eeAddress = 5;
 
@@ -56,12 +56,12 @@ void setup() {
     pinMode(PIN_SecondButton,INPUT);
     pinMode(PIN_ThirdButton,INPUT);
 
-    zowi.init(PIN_YL, PIN_YR, PIN_RL, PIN_RR,false);
-    zowi.setTrims(TRIM_YL, TRIM_YR, TRIM_RL, TRIM_RR);
+    rombi.init(PIN_YL, PIN_YR, PIN_RL, PIN_RR,false);
+    rombi.setTrims(TRIM_YL, TRIM_YR, TRIM_RL, TRIM_RR);
 
 
     char n = EEPROM.read(fac_eeAddress);
-    if(n!=fac_name){ //Only if Zowi name is not the factory name
+    if(n!=fac_name){ //Only if Rombi name is not the factory name
 
         EEPROM.write(fac_eeAddress, fac_name); //Setting factory name on EEPROM
 
@@ -88,7 +88,7 @@ void setup() {
       delay(100);
     }
 
-    zowi.moveServos(500, checkPosition);
+    rombi.moveServos(500, checkPosition);
 
     while((digitalRead(PIN_ThirdButton)==0))
     {
@@ -96,7 +96,7 @@ void setup() {
     }
 
     ledmatrix.writeFull(okMouth_code);
-    zowi.moveServos(500, homePosition);
+    rombi.moveServos(500, homePosition);
 
 }
 
