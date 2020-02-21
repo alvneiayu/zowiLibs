@@ -146,7 +146,7 @@ void Zowi::setRestState(bool state){
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::left(int T) {
-  int left[]={100, 83};
+  int left[]={97, 86};
   _moveServos(T, left);
 }
 
@@ -156,7 +156,7 @@ void Zowi::left(int T) {
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::right(int T) {
-  int right[]={102, 85};
+  int right[]={99, 88};
   _moveServos(T, right);
 }
 
@@ -166,7 +166,7 @@ void Zowi::right(int T) {
 //--    T: Period
 //---------------------------------------------------------
 void Zowi::forward(int T) {
-  int forward[]={102, 83};
+  int forward[]={97, 88};
   _moveServos(T, forward);
 }
 
