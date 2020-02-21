@@ -101,20 +101,22 @@ typedef enum
   YELLOW,
 } Color;
 
-int green[4] = {GREEN, 73, 95, 94};
-int blue[4] = {BLUE, 78, 112, 110};
-int red[4] = {RED, 173, 73, 73};
-int black[4] = {BLACK, 15, 15, 15};
-int black_2[4] = {BLACK, 43, 34, 35};
-int yellow[4] = {YELLOW, 237, 180, 177};
+typedef enum
+{
+  COLOR_DETCT = 0,
+  COLOR_VERIFICATION,
+  COLOR_VERIFIED,
+} RGBState;
 
-#define NUMBER_OF_COLORS 6
+int yellow[4] = {YELLOW, 230, 200, 115};
 
-int *colors[NUMBER_OF_COLORS] = {green, blue, red, black, black_2, yellow};
+#define NUMBER_OF_COLORS_SPECIALS 1
+
+int *colors[NUMBER_OF_COLORS_SPECIALS] = {yellow};
 
 int color_index = 0;
-int color_orders[15] = {};
-bool valid_color = false;
+int color_orders[50] = {};
+int rgb_state = COLOR_DETCT;
 
 int forward[2] = { RED, MOVESTRAIGHT };
 int left[2] = { GREEN, MOVELEFT };
@@ -123,15 +125,25 @@ int stop[2] = { BLACK, STOP };
 int back[2] = { YELLOW, MOVEBACK };
 
 #define NUMBER_OF_ORDERS 5
+#define THRESHOLD 30
 int *orders_color[NUMBER_OF_ORDERS] = {forward, left, right, back, stop};
+
+#define NUMBER_OF_VERIFICATIONS 2
+int num_ver = 0;
 
 int returnColor(int *RGBval) {
   bool found;
 
-  for (int i = 0; i < NUMBER_OF_COLORS; i++) {
+  if (RGBval[0] > 200 && RGBval[1] > 200 && RGBval[2] > 200)
+    return WHITE;
+
+  if (RGBval[0] < 80 && RGBval[1] < 80 && RGBval[2] < 80)
+    return BLACK;
+
+  for (int i = 0; i < NUMBER_OF_COLORS_SPECIALS; i++) {
     found = true;
     for (int j = 1; j < 4; j++) {
-      if (colors[i][j] - 15 > RGBval[j - 1] || colors[i][j] + 15 < RGBval[j - 1]) {
+      if (colors[i][j] - THRESHOLD > RGBval[j - 1] || colors[i][j] + THRESHOLD < RGBval[j - 1]) {
         found = false;
         break;
       }
@@ -141,7 +153,14 @@ int returnColor(int *RGBval) {
       return colors[i][0];
   }
 
-  return WHITE;
+  if (RGBval[0] > RGBval[1] && RGBval[0] > RGBval[2])
+    return RED;
+
+  if (RGBval[1] > RGBval[0] && RGBval[1] > RGBval[2])
+    return GREEN;
+
+  if (RGBval[2] > RGBval[0] && RGBval[2] > RGBval[1])
+    return BLUE;
 }
 
 int executeOrder(int order) {
@@ -382,15 +401,67 @@ void loop() {
          } else if (buttonAPushed == true) {
            if (zowi.getRGB(RGBValues)) {
              col = returnColor(RGBValues);
-             if (col >= 0) {
-               if (col == WHITE) {
-                 valid_color = false;
+             if (col >= 0 && col != WHITE) {
+               if (color_index > 0) {
+                 if (col != color_orders[color_index - 1]) {
+                   if (rgb_state == COLOR_VERIFICATION) {
+                     if (col == color_orders[color_index]) {
+                       if (num_ver >= COLOR_VERIFICATION) {
+                         rgb_state = COLOR_VERIFIED;
+                       } else {
+                         rgb_state = COLOR_VERIFICATION;
+                         num_ver = num_ver + 1;
+                       }
+                     } else {
+                       color_orders[color_index] = col;
+                     }
+                   } else {
+                     color_orders[color_index] = col;
+                     if (NUMBER_OF_VERIFICATIONS > 0) {
+                       rgb_state = COLOR_VERIFICATION;
+                     } else {
+                       rgb_state = COLOR_VERIFIED;
+                     }
+                   }
+                 }
+               } else {
+                 if (rgb_state == COLOR_VERIFICATION) {
+                   if (col == color_orders[color_index]) {
+                     if (num_ver >= COLOR_VERIFICATION) {
+                       rgb_state = COLOR_VERIFIED;
+                     } else {
+                       rgb_state = COLOR_VERIFICATION;
+                       num_ver = num_ver + 1;
+                     }
+                   } else {
+                     color_orders[color_index] = col;
+                   }
+                 } else {
+                   color_orders[color_index] = col;
+                   if (NUMBER_OF_VERIFICATIONS > 0) {
+                     rgb_state = COLOR_VERIFICATION;
+                   } else {
+                     rgb_state = COLOR_VERIFIED;
+                   }
+                 }
                }
 
-               if (valid_color == false && col != WHITE) {
-                 valid_color = true;
-                 color_orders[color_index] = col;
+               if (rgb_state == COLOR_VERIFIED) {
+                 rgb_state = COLOR_DETCT;
                  color_index = color_index + 1;
+                 num_ver = 0;
+
+                 if (col == RED) {
+                   zowi.putMouth(one);
+                 } else if (col == GREEN) {
+                   zowi.putMouth(two);
+                 } else if (col == YELLOW) {
+                   zowi.putMouth(three);
+                 } else if (col == BLUE) {
+                   zowi.putMouth(four);
+                 } else if (col == BLACK) {
+                   zowi.putMouth(five);
+                 }
                }
              }
            }
@@ -433,10 +504,11 @@ void loop() {
                loops = 0;
                state = STOP;
                zowi.putMouth(sad);
+               color_orders[color_index] = BLACK;
+               color_index = color_index + 1;
              }
            }
            if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-             //zowi.forward(3000);
              buttonAPushed = false;
            }
          } else {
@@ -459,6 +531,20 @@ void loop() {
           for (int i = 0; i < 3; i++) {
             sprintf(buf, "RGB[%d] = %d", i, RGBValues[i]);
             Serial.println(buf);
+          }
+
+          if (col == RED) {
+            zowi.putMouth(one);
+          } else if (col == GREEN) {
+            zowi.putMouth(two);
+          } else if (col == YELLOW) {
+            zowi.putMouth(three);
+          } else if (col == BLUE) {
+            zowi.putMouth(four);
+          } else if (col == BLACK) {
+            zowi.putMouth(five);
+          } else if (col == WHITE) {
+            zowi.putMouth(six);
           }
         }
       break;
