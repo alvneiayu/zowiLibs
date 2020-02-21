@@ -48,7 +48,7 @@ RR => |-|               |-| <= RL
 #define PIN_SecondButton 6
 #define PIN_ThirdButton 7
 
-#define MAX_LOOPS             1000
+#define MAX_LOOPS             3000
 
 ///////////////////////////////////////////////////////////////////
 //-- Global Variables -------------------------------------------//
@@ -490,38 +490,38 @@ void loop() {
            sensorLeft = zowi.getIR(LEFT);
            sensorRight = zowi.getIR(RIGHT);
            if ((sensorLeft == LOW) && (sensorRight == LOW)) {
-             zowi.forward(10);
+             zowi.forward(5);
              loops = 0;
              state = MOVESTRAIGHT;
              //zowi.putMouth(smile);
            } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
-             zowi.left(10);
+             zowi.left(5);
              loops = 0;
              state = MOVELEFT;
              //zowi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
-             zowi.right(10);
+             zowi.right(5);
              loops = 0;
              state = MOVERIGHT;
              //zowi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
              if (loops <= MAX_LOOPS) {
                if (state == MOVERIGHT) {
-                 zowi.right(10);
+                 zowi.right(5);
                  loops++;
                  //zowi.putMouth(smile);
                } else if (state == MOVELEFT) {
-                 zowi.left(10);
+                 zowi.left(5);
                  loops++;
                  //zowi.putMouth(smile);
                } else {
-                 zowi.stop(10);
+                 zowi.stop(5);
                  loops = 0;
                  state = STOP;
                  zowi.putMouth(sad);
                }
              } else {
-               zowi.stop(10);
+               zowi.stop(5);
                loops = 0;
                state = STOP;
                zowi.putMouth(sad);
