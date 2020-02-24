@@ -1,8 +1,6 @@
 #ifndef Rombi_h
 #define Rombi_h
 
-#include <Servo.h>
-#include <Oscillator.h>
 #include <EEPROM.h>
 
 #include <US.h>
@@ -10,7 +8,6 @@
 #include <BatReader.h>
 #include <IR.h>
 #include <TCS3200.h>
-#include <ServoEncoder.h>
 
 #include "Rombi_mouths.h"
 #include "Rombi_sounds.h"
@@ -34,27 +31,12 @@
 #define IR_LEFT_PIN           3
 #define IR_RIGHT_PIN          A3
 
-#define SERVO_ENC_LEFT_PIN    A4
-#define SERVO_ENC_RIGHT_PIN   A5
-
 class Rombi
 {
   public:
 
     //-- Rombi initialization
-    void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo, int IRLeft=IR_LEFT_PIN, int IRRight=IR_RIGHT_PIN, int LeftEncoder=SERVO_ENC_LEFT_PIN, int RightEncoder=SERVO_ENC_RIGHT_PIN);
-
-    //-- Attach & detach functions
-    void attachServos();
-    void detachServos();
-
-    //-- Oscillator Trims
-    void setTrims(int YL, int YR, int RL, int RR);
-    void saveTrimsOnEEPROM();
-
-    //-- Predetermined Motion Functions
-    void _moveServos(int time, int  servo_target[]);
-    void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
+    void init(int RL, int RR, bool load_calibration=true, int NoiseSensor=PIN_NoiseSensor, int Buzzer=PIN_Buzzer, int USTrigger=PIN_Trigger, int USEcho=PIN_Echo, int IRLeft=IR_LEFT_PIN, int IRRight=IR_RIGHT_PIN);
 
     //-- HOME = Rombi at rest position
     void home();
@@ -101,17 +83,12 @@ class Rombi
     
     LedMatrix ledmatrix;
     BatReader battery;
-    Oscillator servo[2];
     US us;
     IR ir_left;
     IR ir_right;
     TCS3200 rgb_detector;
-    ServoEncoder left_encoder;
-    ServoEncoder right_encoder;
 
-    int servo_pins[2];
-    int servo_trim[2];
-    int servo_position[2];
+    int motor_pins[2];
 
     int pinBuzzer;
     int pinNoiseSensor;

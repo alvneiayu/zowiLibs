@@ -8,29 +8,17 @@
 
 
 #include "Rombi.h"
-#include <Oscillator.h>
 #include <US.h>
 #include <IR.h>
 #include <TCS3200.h>
 
 
-void Rombi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight, int LeftEncoder, int RightEncoder) {
+void Rombi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight) {
   
-  servo_pins[0] = RL;
-  servo_pins[1] = RR;
+  motor_pins[0] = RL;
+  motor_pins[1] = RR;
 
-  attachServos();
   isRombiResting=false;
-
-  if (load_calibration) {
-    for (int i = 0; i < 2; i++) {
-      int servo_trim = EEPROM.read(i);
-      if (servo_trim > 128) servo_trim -= 256;
-      servo[i].SetTrim(servo_trim);
-    }
-  }
-  
-  for (int i = 0; i < 2; i++) servo_position[i] = 90;
 
   // IR init
   ir_left.init(IRLeft);
@@ -38,10 +26,6 @@ void Rombi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buz
 
   // RGB Init
   rgb_detector.init();
-
-  // Encoder
-  left_encoder.init(LeftEncoder, LEFT);
-  right_encoder.init(RightEncoder, RIGHT);
 
   //US sensor init with the pins:
   us.init(USTrigger, USEcho);
@@ -55,60 +39,8 @@ void Rombi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buz
 }
 
 ///////////////////////////////////////////////////////////////////
-//-- ATTACH & DETACH FUNCTIONS ----------------------------------//
-///////////////////////////////////////////////////////////////////
-void Rombi::attachServos(){
-    servo[0].attach(servo_pins[0]);
-    servo[1].attach(servo_pins[1]);
-}
-
-void Rombi::detachServos(){
-    servo[0].detach();
-    servo[1].detach();
-}
-
-///////////////////////////////////////////////////////////////////
-//-- OSCILLATORS TRIMS ------------------------------------------//
-///////////////////////////////////////////////////////////////////
-void Rombi::setTrims(int YL, int YR, int RL, int RR) {
-  servo[0].SetTrim(YL);
-  servo[1].SetTrim(YR);
-}
-
-void Rombi::saveTrimsOnEEPROM() {
-  
-  for (int i = 0; i < 4; i++){ 
-      EEPROM.write(i, servo[i].getTrim());
-  } 
-      
-}
-
-
-///////////////////////////////////////////////////////////////////
 //-- BASIC MOTION FUNCTIONS -------------------------------------//
 ///////////////////////////////////////////////////////////////////
-void Rombi::_moveServos(int time, int  servo_target[]) {
-
-  attachServos();
-  if(getRestState()==true){
-        setRestState(false);
-  }
-
-  if(time > 10) {
-    final_time = millis() + time;
-    for (int i = 0; i < 2; i++)
-      servo[i].SetPosition(servo_target[i]);
-    
-    final_time =  millis() + time;
-    while (millis() <= final_time)
-      continue;
-  } else {
-    for (int i = 0; i < 2; i++)
-      servo[i].SetPosition(servo_target[i]);
-  }
-  for (int i = 0; i < 2; i++) servo_position[i] = servo_target[i];
-}
-
 
 ///////////////////////////////////////////////////////////////////
 //-- HOME = Rombi at rest position -------------------------------//
@@ -118,9 +50,8 @@ void Rombi::home(){
   if(isRombiResting==false){ //Go to rest position only if necessary
 
     int homes[2]={90, 90}; //All the servos at rest position
-    _moveServos(500,homes);   //Move the servos in half a second
+   // _moveServos(500,homes);   //Move the servos in half a second
 
-    detachServos();
     isRombiResting=true;
   }
 }
@@ -147,7 +78,7 @@ void Rombi::setRestState(bool state){
 //---------------------------------------------------------
 void Rombi::left(int T) {
   int left[]={97, 86};
-  _moveServos(T, left);
+  //_moveServos(T, left);
 }
 
 //---------------------------------------------------------
@@ -157,7 +88,7 @@ void Rombi::left(int T) {
 //---------------------------------------------------------
 void Rombi::right(int T) {
   int right[]={99, 88};
-  _moveServos(T, right);
+  //_moveServos(T, right);
 }
 
 //---------------------------------------------------------
@@ -167,7 +98,7 @@ void Rombi::right(int T) {
 //---------------------------------------------------------
 void Rombi::forward(int T) {
   int forward[]={97, 88};
-  _moveServos(T, forward);
+  //_moveServos(T, forward);
 }
 
 //---------------------------------------------------------
@@ -177,7 +108,7 @@ void Rombi::forward(int T) {
 //---------------------------------------------------------
 void Rombi::back(int T) {
   int back[]={83, 100};
-  _moveServos(T, back);
+  //_moveServos(T, back);
 }
 
 //---------------------------------------------------------
@@ -187,7 +118,7 @@ void Rombi::back(int T) {
 //---------------------------------------------------------
 void Rombi::stop(int T) {
   int stop[]={90, 90};
-  _moveServos(T, stop);
+  //_moveServos(T, stop);
 }
 
 //---------------------------------------------------------
@@ -197,7 +128,7 @@ void Rombi::stop(int T) {
 //---------------------------------------------------------
 void Rombi::left_order(int T) {
   int left_order[]={85, 85};
-  _moveServos(T, left_order);
+  //_moveServos(T, left_order);
 }
 
 //---------------------------------------------------------
@@ -207,7 +138,7 @@ void Rombi::left_order(int T) {
 //---------------------------------------------------------
 void Rombi::right_order(int T) {
   int right_order[]={100, 100};
-  _moveServos(T, right_order);
+  //_moveServos(T, right_order);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -266,28 +197,6 @@ int Rombi::getRGB(int *RGBValues) {
     }
 
     return false;
-}
-
-//---------------------------------------------------------
-//-- Rombi getEncLap: return rombi's Encoder Lap val
-//---------------------------------------------------------
-int Rombi::getEncLap(int side) {
-    if (side == LEFT) {
-        return left_encoder.getLap();
-    } else {
-        return right_encoder.getLap();
-    }
-}
-
-//---------------------------------------------------------
-//-- Rombi getEncRead: return rombi's Encoder val
-//---------------------------------------------------------
-int Rombi::getEncVal(int side) {
-    if (side == LEFT) {
-        return left_encoder.read();
-    } else {
-        return right_encoder.read();
-    }
 }
 
 //---------------------------------------------------------
@@ -857,7 +766,6 @@ void Rombi::playGesture(int gesture){
         _tone(300,200,1);
         putMouth(xMouth);
 
-        detachServos();
         _tone(150,2200,1);
         
         delay(600);

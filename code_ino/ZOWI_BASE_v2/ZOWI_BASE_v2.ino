@@ -2,19 +2,13 @@
 //----------------------------------------------------------------
 //-- Rombi basic firmware v2
 //-- (c) BQ. Released under a GPL licencse
-//-- 04 December 2015
-//-- Authors:  Anita de Prado: ana.deprado@bq.com
-//--           Jose Alberca:   jose.alberca@bq.com
-//--           Javier Isabel:  javier.isabel@bq.com
-//--           Juan Gonzalez (obijuan): juan.gonzalez@bq.com
-//--           Irene Sanz : irene.sanz@bq.com
-//--           Alvaro Neira : alvaro.neira@bq.com
+//-- 24 February 2020
+//-- Authors: Alvaro Neira : alvaro.neira@bq.com
+//-- Based on Zowi code
 //-----------------------------------------------------------------
 //-- Experiment with all the features that Rombi has!
 //-----------------------------------------------------------------
 
-#include <Servo.h> 
-#include <Oscillator.h>
 #include <EEPROM.h>
 #include <BatReader.h>
 #include <US.h>
@@ -209,10 +203,6 @@ void setup(){
   //Set the servo pins
   rombi.init(PIN_RL,PIN_RR,false);
  
-  //Uncomment this to set the servo trims manually and save on EEPROM 
-    //rombi.setTrims(TRIM_YL, TRIM_YR, TRIM_RL, TRIM_RR);
-    //rombi.saveTrimsOnEEPROM(); //Uncomment this only for one upload when you finaly set the trims.
-
   //Set a random seed
   randomSeed(analogRead(A6));
 
@@ -223,8 +213,6 @@ void setup(){
   SCmd.addCommand("M", receiveMovement);  //  sendAck & sendFinalAck
   SCmd.addCommand("H", receiveGesture);   //  sendAck & sendFinalAck
   SCmd.addCommand("K", receiveSing);      //  sendAck & sendFinalAck
-  SCmd.addCommand("C", receiveTrims);     //  sendAck & sendFinalAck
-  SCmd.addCommand("G", receiveServo);     //  sendAck & sendFinalAck
   SCmd.addCommand("R", receiveName);      //  sendAck & sendFinalAck
   SCmd.addCommand("E", requestName);
   SCmd.addCommand("D", requestDistance);
@@ -686,102 +674,6 @@ void recieveBuzzer(){
 
 }
 
-
-//-- Function to receive TRims commands
-void receiveTrims(){  
-
-    //sendAck & stop if necessary
-    sendAck();
-    rombi.home(); 
-
-    int trim_YL,trim_YR,trim_RL,trim_RR;
-
-    //Definition of Servo Bluetooth command
-    //C trim_YL trim_YR trim_RL trim_RR
-    //Examples of receiveTrims Bluetooth commands
-    //C 20 0 -8 3
-    bool error = false;
-    char *arg;
-    arg=SCmd.next();
-    if (arg != NULL) { trim_YL=atoi(arg); }    // Converts a char string to an integer   
-    else {error=true;}
-
-    arg = SCmd.next(); 
-    if (arg != NULL) { trim_YR=atoi(arg); }    // Converts a char string to an integer  
-    else {error=true;}
-
-    arg = SCmd.next(); 
-    if (arg != NULL) { trim_RL=atoi(arg); }    // Converts a char string to an integer  
-    else {error=true;}
-
-    arg = SCmd.next(); 
-    if (arg != NULL) { trim_RR=atoi(arg); }    // Converts a char string to an integer  
-    else {error=true;}
-    
-    if(error==true){
-
-      rombi.putMouth(xMouth);
-      delay(2000);
-      rombi.clearMouth();
-
-    }else{ //Save it on EEPROM
-      rombi.setTrims(trim_YL, trim_YR, trim_RL, trim_RR);
-      rombi.saveTrimsOnEEPROM(); //Uncomment this only for one upload when you finaly set the trims.
-    } 
-
-    sendFinalAck();
-
-}
-
-
-//-- Function to receive Servo commands
-void receiveServo(){  
-
-    sendAck(); 
-    moveId = 30;
-
-    //Definition of Servo Bluetooth command
-    //G  servo_YL servo_YR servo_RL servo_RR 
-    //Example of receiveServo Bluetooth commands
-    //G 90 85 96 78 
-    bool error = false;
-    char *arg;
-    int servo_YL,servo_YR,servo_RL,servo_RR;
-
-    arg=SCmd.next();
-    if (arg != NULL) { servo_YL=atoi(arg); }    // Converts a char string to an integer   
-    else {error=true;}
-
-    arg = SCmd.next(); 
-    if (arg != NULL) { servo_YR=atoi(arg); }    // Converts a char string to an integer  
-    else {error=true;}
-
-    arg = SCmd.next(); 
-    if (arg != NULL) { servo_RL=atoi(arg); }    // Converts a char string to an integer  
-    else {error=true;}
-
-    arg = SCmd.next(); 
-    if (arg != NULL) { servo_RR=atoi(arg); }    // Converts a char string to an integer  
-    else {error=true;}
-    
-    if(error==true){
-
-      rombi.putMouth(xMouth);
-      delay(2000);
-      rombi.clearMouth();
-
-    }else{ //Update Servo:
-
-      int servoPos[4]={servo_YL, servo_YR, servo_RL, servo_RR}; 
-      rombi._moveServos(200, servoPos);   //Move 200ms
-      
-    }
-
-    sendFinalAck();
-
-}
-
-
 //-- Function to receive movement commands
 void receiveMovement(){
 
@@ -1167,7 +1059,7 @@ void RombiSleeping_withInterrupts(){
   int bedPos_0[4]={90, 90}; 
 
   if(!buttonPushed){
-    rombi._moveServos(700, bedPos_0);  
+    //rombi._moveServos(700, bedPos_0);  
   }
 
   for(int i=0; i<4;i++){
