@@ -15,8 +15,7 @@
 
 void Rombi::init(int RL, int RR, bool load_calibration, int NoiseSensor, int Buzzer, int USTrigger, int USEcho, int IRLeft, int IRRight) {
   
-  motor_pins[0] = RL;
-  motor_pins[1] = RR;
+  motors.init(RL, RR);
 
   isRombiResting=false;
 
@@ -76,9 +75,8 @@ void Rombi::setRestState(bool state){
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Rombi::left(int T) {
-  int left[]={97, 86};
-  //_moveServos(T, left);
+void Rombi::left(uint16_t milimeters) {
+  motors.moveAcc(STEP_LEFT, milimeters, CARD_RPM);
 }
 
 //---------------------------------------------------------
@@ -86,9 +84,8 @@ void Rombi::left(int T) {
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Rombi::right(int T) {
-  int right[]={99, 88};
-  //_moveServos(T, right);
+void Rombi::right(uint16_t milimeters) {
+  motors.moveAcc(STEP_RIGHT, milimeters, CARD_RPM);
 }
 
 //---------------------------------------------------------
@@ -96,9 +93,8 @@ void Rombi::right(int T) {
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Rombi::forward(int T) {
-  int forward[]={97, 88};
-  //_moveServos(T, forward);
+void Rombi::forward(uint16_t milimeters) {
+  motors.moveAcc(STEP_FORWARD, milimeters, CARD_RPM);
 }
 
 //---------------------------------------------------------
@@ -106,19 +102,8 @@ void Rombi::forward(int T) {
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Rombi::back(int T) {
-  int back[]={83, 100};
-  //_moveServos(T, back);
-}
-
-//---------------------------------------------------------
-//-- Rombi movement: stop
-//--  Parameters:
-//--    T: Period
-//---------------------------------------------------------
-void Rombi::stop(int T) {
-  int stop[]={90, 90};
-  //_moveServos(T, stop);
+void Rombi::back(uint16_t milimeters) {
+  motors.moveAcc(STEP_BACKWARDS, milimeters, CARD_RPM);
 }
 
 //---------------------------------------------------------
@@ -126,9 +111,8 @@ void Rombi::stop(int T) {
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Rombi::left_order(int T) {
-  int left_order[]={85, 85};
-  //_moveServos(T, left_order);
+void Rombi::left_order() {
+  motors.moveAcc(STEP_LEFT_ORDER, 101, CARD_RPM); //101 = 90º
 }
 
 //---------------------------------------------------------
@@ -136,9 +120,8 @@ void Rombi::left_order(int T) {
 //--  Parameters:
 //--    T: Period
 //---------------------------------------------------------
-void Rombi::right_order(int T) {
-  int right_order[]={100, 100};
-  //_moveServos(T, right_order);
+void Rombi::right_order() {
+  motors.moveAcc(STEP_RIGHT_ORDER, 101, CARD_RPM); //101 = 90º
 }
 
 ///////////////////////////////////////////////////////////////////

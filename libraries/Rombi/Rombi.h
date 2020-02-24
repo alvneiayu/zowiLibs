@@ -8,6 +8,7 @@
 #include <BatReader.h>
 #include <IR.h>
 #include <TCS3200.h>
+#include <StepMotors.h>
 
 #include "Rombi_mouths.h"
 #include "Rombi_sounds.h"
@@ -44,14 +45,13 @@ class Rombi
     void setRestState(bool state);
     
     //-- Predetermined Motion Functions
-    void left(int T = 1000);
-    void right(int T = 1000);
-    void back(int T = 1000);
-    void forward(int T = 1000);
-    void stop(int T = 1000);
+    void left(uint16_t milimeters = 1);
+    void right(uint16_t milimeters = 1);
+    void back(uint16_t milimeters = 1);
+    void forward(uint16_t milimeters = 1);
 
-    void left_order(int T = 1000);
-    void right_order(int T = 1000);
+    void left_order();
+    void right_order();
 
     //-- Sensors functions
     float getDistance(); //US sensor
@@ -87,8 +87,7 @@ class Rombi
     IR ir_left;
     IR ir_right;
     TCS3200 rgb_detector;
-
-    int motor_pins[2];
+    StepMotors motors;
 
     int pinBuzzer;
     int pinNoiseSensor;

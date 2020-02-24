@@ -168,20 +168,18 @@ int executeOrder(int order) {
 
     switch (orders_color[i][1]) {
     case MOVESTRAIGHT:
-      rombi.forward(2000);
+      rombi.forward(160);
       break;
     case MOVELEFT:
-      rombi.left_order(1010);
+      rombi.left_order();
       break;
     case MOVERIGHT:
-      rombi.right_order(850);
+      rombi.right_order();
       break;
     case STOP:
-      rombi.stop(100);
       break;
     case MOVEBACK:
-      rombi.back(2500);
-      rombi.stop(100);
+      rombi.back(160);
       break;
     default:
       break;
@@ -278,12 +276,6 @@ void setup(){
   //In this case, Rombi does a longer greeting
   //5 = EEPROM address that contains first name character
   if (EEPROM.read(5)==name_fir){ 
-
-    if(!buttonPushed){  
-        rombi.back(0.5);
-        rombi.forward(0.5);
-        delay(200); 
-    }
 
     if(!buttonPushed){ 
         rombi.putMouth(smallSurprise);
@@ -478,38 +470,36 @@ void loop() {
            sensorLeft = rombi.getIR(LEFT);
            sensorRight = rombi.getIR(RIGHT);
            if ((sensorLeft == LOW) && (sensorRight == LOW)) {
-             rombi.forward(5);
+             rombi.forward(3);
              loops = 0;
              state = MOVESTRAIGHT;
              //rombi.putMouth(smile);
            } else if ((sensorLeft == LOW) && (sensorRight == HIGH)) {
-             rombi.left(5);
+             rombi.left(1);
              loops = 0;
              state = MOVELEFT;
              //rombi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == LOW)) {
-             rombi.right(5);
+             rombi.right(1);
              loops = 0;
              state = MOVERIGHT;
              //rombi.putMouth(smile);
            } else if ((sensorLeft == HIGH) && (sensorRight == HIGH)) {
              if (loops <= MAX_LOOPS) {
                if (state == MOVERIGHT) {
-                 rombi.right(5);
+                 rombi.right(1);
                  loops++;
                  //rombi.putMouth(smile);
                } else if (state == MOVELEFT) {
-                 rombi.left(5);
+                 rombi.left(1);
                  loops++;
                  //rombi.putMouth(smile);
                } else {
-                 rombi.stop(5);
                  loops = 0;
                  state = STOP;
                  rombi.putMouth(sad);
                }
              } else {
-               rombi.stop(5);
                loops = 0;
                state = STOP;
                rombi.putMouth(sad);
@@ -522,10 +512,8 @@ void loop() {
            }
          } else {
            if (color_index != 0 && color_orders[color_index - 1] == BLACK) {
-             rombi.stop(10);
              rombi.putMouth(smile);
            } else {
-             rombi.stop(10);
              rombi.putMouth(sad);
            }
          }
@@ -1055,12 +1043,6 @@ void RombiLowBatteryAlarm(){
 }
 
 void RombiSleeping_withInterrupts(){
-
-  int bedPos_0[4]={90, 90}; 
-
-  if(!buttonPushed){
-    //rombi._moveServos(700, bedPos_0);  
-  }
 
   for(int i=0; i<4;i++){
 
